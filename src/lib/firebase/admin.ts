@@ -24,30 +24,102 @@ function loadServiceAccountFromFile(): Record<string, string> | null {
   return JSON.parse(readFileSync(resolved, "utf8"));
 }
 
+function parseServiceAccountJson(raw: string): Record<string, string> | null {
+  let value = raw.trim();
+
+  if (
+    (value.startsWith('"') && value.endsWith('"')) ||
+    (value.startsWith("'") && value.endsWith("'"))
+  ) {
+    try {
+      const unwrapped = JSON.parse(value) as string;
+      value = unwrapped;
+    } catch {
+      value = value.slice(1, -1);
+    }
+  }
+
+  const candidates = [value, value.replace(/\r?\n/g, "")];
+
+  for (const candidate of candidates) {
+    try {
+      const parsed = JSON.parse(candidate) as Record<string, string>;
+      if (typeof parsed.private_key === "string") {
+        parsed.private_key = parsed.private_key.replace(/\\n/g, "\n");
+      }
+      return parsed;
+    } catch {
+      // try next candidate
+    }
+  }
+
+  return null;
+}
+
+function normalizePrivateKey(key: string): string {
+  let value = key.trim();
+
+  if (
+    (value.startsWith('"') && value.endsWith('"')) ||
+    (value.startsWith("'") && value.endsWith("'"))
+  ) {
+    value = value.slice(1, -1);
+  }
+
+  return value.replace(/\\n/g, "\n");
+}
+
 function getServiceAccount() {
   const fromFile = loadServiceAccountFromFile();
   if (fromFile) return fromFile;
 
   const json = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
   if (json) {
-    try {
-      return JSON.parse(json);
-    } catch {
-      return null;
-    }
+    const parsed = parseServiceAccountJson(json);
+    if (parsed) return parsed;
   }
 
   const projectId =
     process.env.FIREBASE_PROJECT_ID ??
     process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
-  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL?.trim();
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY
+    ? normalizePrivateKey(process.env.FIREBASE_PRIVATE_KEY)
+    : undefined;
 
   if (projectId && clientEmail && privateKey) {
     return { projectId, clientEmail, privateKey };
   }
 
   return null;
+}
+
+export function getFirebaseAdminHealth(): {
+  hasCredentials: boolean;
+  initOk: boolean;
+  issues: string[];
+} {
+  const issues: string[] = [];
+  const serviceAccount = getServiceAccount();
+
+  if (!serviceAccount) {
+    issues.push(
+      "Firebase Admin 키 없음: FIREBASE_SERVICE_ACCOUNT_KEY 또는 FIREBASE_PROJECT_ID + FIREBASE_CLIENT_EMAIL + FIREBASE_PRIVATE_KEY 필요"
+    );
+    return { hasCredentials: false, initOk: false, issues };
+  }
+
+  try {
+    getAdminAuth();
+    return { hasCredentials: true, initOk: true, issues };
+  } catch (error) {
+    issues.push(
+      error instanceof Error
+        ? error.message
+        : "Firebase Admin 초기화 실패"
+    );
+    return { hasCredentials: true, initOk: false, issues };
+  }
 }
 
 export function isFirebaseAdminConfigured(): boolean {

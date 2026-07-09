@@ -17,6 +17,22 @@ export function LoginForm() {
       setError("관리자 권한이 없습니다. 접근이 거부되었습니다.");
       void fetch("/api/auth/logout", { method: "POST" });
     }
+
+    void fetch("/api/auth/status", { cache: "no-store" })
+      .then((res) => res.json())
+      .then(
+        (data: {
+          ready?: boolean;
+          issues?: string[];
+        }) => {
+          if (!data.ready && data.issues?.length) {
+            setError(data.issues.join(" / "));
+          }
+        }
+      )
+      .catch(() => {
+        setError("서버 설정 상태를 확인하지 못했습니다.");
+      });
   }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {

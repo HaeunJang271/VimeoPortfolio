@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { isAdmin } from "@/lib/firebase/admin-users";
 import {
   getAdminAuth,
+  isFirebaseAdminConfigured,
   SESSION_COOKIE_NAME,
   SESSION_EXPIRES_IN,
 } from "@/lib/firebase/admin";
@@ -74,7 +75,7 @@ export async function POST(request: Request) {
         return NextResponse.json(
           {
             error:
-              "Firebase API Key가 올바르지 않습니다. Vercel의 NEXT_PUBLIC_FIREBASE_API_KEY 값을 Firebase Console과 동일하게 설정하세요.",
+              "Firebase API Key가 올바르지 않습니다. Vercel의 NEXT_PUBLIC_FIREBASE_API_KEY를 Firebase Console 값과 동일하게 설정하세요.",
           },
           { status: 500 }
         );
@@ -94,6 +95,16 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: "로그인에 실패했습니다." },
         { status: 401 }
+      );
+    }
+
+    if (!isFirebaseAdminConfigured()) {
+      return NextResponse.json(
+        {
+          error:
+            "Firebase Admin 키가 설정되지 않았습니다. Vercel에 FIREBASE_SERVICE_ACCOUNT_KEY를 firebase-service-account.json 전체 내용으로 등록하세요.",
+        },
+        { status: 500 }
       );
     }
 
@@ -125,11 +136,22 @@ export async function POST(request: Request) {
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to sign in";
-    const status =
-      message.includes("credentials") || message.includes("service account")
-        ? 500
-        : 401;
 
-    return NextResponse.json({ error: message }, { status });
+    if (
+      message.includes("service account") ||
+      message.includes("credentials") ||
+      message.includes("not configured") ||
+      message.includes("private key")
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Firebase Admin 설정 오류입니다. Vercel의 FIREBASE_SERVICE_ACCOUNT_KEY 값을 다시 확인하세요.",
+        },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ error: message }, { status: 401 });
   }
 }
