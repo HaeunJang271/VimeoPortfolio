@@ -1,4 +1,4 @@
-import type { FirebaseClientConfig } from "@/lib/firebase/client";
+import type { FirebaseClientConfig } from "@/types/firebase";
 
 export function getFirebaseConfigFromEnv(): FirebaseClientConfig | null {
   const config: FirebaseClientConfig = {

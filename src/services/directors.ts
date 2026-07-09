@@ -1,5 +1,5 @@
 import { FieldValue } from "firebase-admin/firestore";
-import { getAdminDb } from "@/lib/firebase/admin";
+import { getAdminDb, isFirebaseAdminConfigured } from "@/lib/firebase/admin";
 import {
   DIRECTORS_COLLECTION,
   docToDirector,
@@ -10,18 +10,8 @@ import type { Director, DirectorFormData } from "@/types/director";
 import type { Work } from "@/types/work";
 import { sortWorksByOrder } from "@/utils/work-order";
 
-function isFirebaseConfigured(): boolean {
-  return !!(
-    process.env.FIREBASE_SERVICE_ACCOUNT_PATH ||
-    process.env.FIREBASE_SERVICE_ACCOUNT_KEY ||
-    (process.env.FIREBASE_PROJECT_ID &&
-      process.env.FIREBASE_CLIENT_EMAIL &&
-      process.env.FIREBASE_PRIVATE_KEY)
-  );
-}
-
 export async function getDirectors(): Promise<Director[]> {
-  if (!isFirebaseConfigured()) return [];
+  if (!isFirebaseAdminConfigured()) return [];
 
   try {
     const snapshot = await getAdminDb()
@@ -37,7 +27,7 @@ export async function getDirectors(): Promise<Director[]> {
 }
 
 export async function getDirectorBySlug(slug: string): Promise<Director | null> {
-  if (!isFirebaseConfigured()) return null;
+  if (!isFirebaseAdminConfigured()) return null;
 
   try {
     const snapshot = await getAdminDb()
@@ -57,7 +47,7 @@ export async function getDirectorBySlug(slug: string): Promise<Director | null> 
 }
 
 export async function getDirectorById(id: string): Promise<Director | null> {
-  if (!isFirebaseConfigured()) return null;
+  if (!isFirebaseAdminConfigured()) return null;
 
   try {
     const doc = await getAdminDb()
@@ -133,7 +123,7 @@ export async function getWorksByDirectorId(
   directorId: string,
   workOrder: string[] = []
 ): Promise<Work[]> {
-  if (!isFirebaseConfigured()) return [];
+  if (!isFirebaseAdminConfigured()) return [];
 
   try {
     const snapshot = await getAdminDb()

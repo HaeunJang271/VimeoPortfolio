@@ -1,4 +1,4 @@
-import { getAdminDb } from "@/lib/firebase/admin";
+import { getAdminDb, isFirebaseAdminConfigured } from "@/lib/firebase/admin";
 import {
   docToSiteSettings,
   SETTINGS_COLLECTION,
@@ -6,16 +6,6 @@ import {
 import type { SiteSettings, SiteSettingsFormData } from "@/types/settings";
 
 const SETTINGS_DOC_ID = "site";
-
-function isFirebaseConfigured(): boolean {
-  return !!(
-    process.env.FIREBASE_SERVICE_ACCOUNT_PATH ||
-    process.env.FIREBASE_SERVICE_ACCOUNT_KEY ||
-    (process.env.FIREBASE_PROJECT_ID &&
-      process.env.FIREBASE_CLIENT_EMAIL &&
-      process.env.FIREBASE_PRIVATE_KEY)
-  );
-}
 
 function getDefaultSettings(): SiteSettings {
   return {
@@ -28,7 +18,7 @@ function getDefaultSettings(): SiteSettings {
 }
 
 export async function getSiteSettings(): Promise<SiteSettings> {
-  if (!isFirebaseConfigured()) return getDefaultSettings();
+  if (!isFirebaseAdminConfigured()) return getDefaultSettings();
 
   try {
     const doc = await getAdminDb()

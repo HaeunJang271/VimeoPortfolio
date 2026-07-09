@@ -91,6 +91,10 @@ export function LoginForm() {
         >
           {loading ? "Signing in..." : "Sign In"}
         </button>
+
+        <p className="text-center text-[10px] tracking-wider text-white/30">
+          Login v3 · server-only
+        </p>
       </form>
     </FadeIn>
   );

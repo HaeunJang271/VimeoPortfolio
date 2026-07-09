@@ -1,21 +1,11 @@
 import { FieldValue } from "firebase-admin/firestore";
-import { getAdminDb } from "@/lib/firebase/admin";
+import { getAdminDb, isFirebaseAdminConfigured } from "@/lib/firebase/admin";
 import { docToWork, WORKS_COLLECTION } from "@/lib/firebase/firestore";
 import type { Work, WorkFormData } from "@/types/work";
 import { sortWorksByOrder } from "@/utils/work-order";
 
-function isFirebaseConfigured(): boolean {
-  return !!(
-    process.env.FIREBASE_SERVICE_ACCOUNT_PATH ||
-    process.env.FIREBASE_SERVICE_ACCOUNT_KEY ||
-    (process.env.FIREBASE_PROJECT_ID &&
-      process.env.FIREBASE_CLIENT_EMAIL &&
-      process.env.FIREBASE_PRIVATE_KEY)
-  );
-}
-
 export async function getWorks(): Promise<Work[]> {
-  if (!isFirebaseConfigured()) return [];
+  if (!isFirebaseAdminConfigured()) return [];
 
   try {
     const snapshot = await getAdminDb()
@@ -31,7 +21,7 @@ export async function getWorks(): Promise<Work[]> {
 }
 
 export async function getWorkBySlug(slug: string): Promise<Work | null> {
-  if (!isFirebaseConfigured()) return null;
+  if (!isFirebaseAdminConfigured()) return null;
 
   try {
     const snapshot = await getAdminDb()
@@ -51,7 +41,7 @@ export async function getWorkBySlug(slug: string): Promise<Work | null> {
 }
 
 export async function getWorkById(id: string): Promise<Work | null> {
-  if (!isFirebaseConfigured()) return null;
+  if (!isFirebaseAdminConfigured()) return null;
 
   try {
     const doc = await getAdminDb().collection(WORKS_COLLECTION).doc(id).get();

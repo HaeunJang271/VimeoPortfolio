@@ -18,9 +18,7 @@ function loadServiceAccountFromFile(): Record<string, string> | null {
 
   const resolved = resolve(process.cwd(), filePath);
   if (!existsSync(resolved)) {
-    throw new Error(
-      `Firebase service account file not found: ${resolved}. Download the key from Firebase Console → Project Settings → Service Accounts.`
-    );
+    return null;
   }
 
   return JSON.parse(readFileSync(resolved, "utf8"));
@@ -32,7 +30,11 @@ function getServiceAccount() {
 
   const json = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
   if (json) {
-    return JSON.parse(json);
+    try {
+      return JSON.parse(json);
+    } catch {
+      return null;
+    }
   }
 
   const projectId =
@@ -46,6 +48,10 @@ function getServiceAccount() {
   }
 
   return null;
+}
+
+export function isFirebaseAdminConfigured(): boolean {
+  return getServiceAccount() !== null;
 }
 
 export function getAdminApp(): App {
