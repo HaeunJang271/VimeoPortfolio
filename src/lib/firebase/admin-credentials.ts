@@ -11,10 +11,58 @@ function loadServiceAccountFromFile(): Record<string, string> | null {
   }
 
   try {
-    return JSON.parse(readFileSync(resolved, "utf8"));
+    return normalizeServiceAccount(
+      JSON.parse(readFileSync(resolved, "utf8")) as Record<string, string>
+    );
   } catch {
     return null;
   }
+}
+
+export function normalizePrivateKey(key: string): string {
+  let value = key.trim();
+
+  if (
+    (value.startsWith('"') && value.endsWith('"')) ||
+    (value.startsWith("'") && value.endsWith("'"))
+  ) {
+    try {
+      value = JSON.parse(value) as string;
+    } catch {
+      value = value.slice(1, -1).trim();
+    }
+  }
+
+  let prev = "";
+  while (prev !== value) {
+    prev = value;
+    value = value.replace(/\\n/g, "\n").replace(/\\r/g, "\r");
+  }
+
+  value = value.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+
+  if (!value.endsWith("\n")) {
+    value += "\n";
+  }
+
+  return value;
+}
+
+function normalizeServiceAccount(
+  account: Record<string, string>
+): Record<string, string> {
+  const privateKey = account.private_key ?? account.privateKey;
+
+  if (typeof privateKey === "string") {
+    const normalized = normalizePrivateKey(privateKey);
+    return {
+      ...account,
+      private_key: normalized,
+      privateKey: normalized,
+    };
+  }
+
+  return account;
 }
 
 function parseServiceAccountJson(raw: string): Record<string, string> | null {
@@ -25,8 +73,7 @@ function parseServiceAccountJson(raw: string): Record<string, string> | null {
     (value.startsWith("'") && value.endsWith("'"))
   ) {
     try {
-      const unwrapped = JSON.parse(value) as string;
-      value = unwrapped;
+      value = JSON.parse(value) as string;
     } catch {
       value = value.slice(1, -1);
     }
@@ -36,30 +83,21 @@ function parseServiceAccountJson(raw: string): Record<string, string> | null {
 
   for (const candidate of candidates) {
     try {
-      const parsed = JSON.parse(candidate) as Record<string, string>;
-      if (typeof parsed.private_key === "string") {
-        parsed.private_key = parsed.private_key.replace(/\\n/g, "\n");
+      let parsed: unknown = JSON.parse(candidate);
+
+      if (typeof parsed === "string") {
+        parsed = JSON.parse(parsed);
       }
-      return parsed;
+
+      if (parsed && typeof parsed === "object") {
+        return normalizeServiceAccount(parsed as Record<string, string>);
+      }
     } catch {
       // try next candidate
     }
   }
 
   return null;
-}
-
-function normalizePrivateKey(key: string): string {
-  let value = key.trim();
-
-  if (
-    (value.startsWith('"') && value.endsWith('"')) ||
-    (value.startsWith("'") && value.endsWith("'"))
-  ) {
-    value = value.slice(1, -1);
-  }
-
-  return value.replace(/\\n/g, "\n");
 }
 
 export function getServiceAccount(): Record<string, string> | null {
@@ -76,12 +114,15 @@ export function getServiceAccount(): Record<string, string> | null {
     process.env.FIREBASE_PROJECT_ID ??
     process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL?.trim();
-  const privateKey = process.env.FIREBASE_PRIVATE_KEY
-    ? normalizePrivateKey(process.env.FIREBASE_PRIVATE_KEY)
-    : undefined;
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.trim();
 
   if (projectId && clientEmail && privateKey) {
-    return { projectId, clientEmail, privateKey };
+    return normalizeServiceAccount({
+      type: "service_account",
+      project_id: projectId,
+      client_email: clientEmail,
+      private_key: privateKey,
+    });
   }
 
   return null;
@@ -98,7 +139,10 @@ export function validateServiceAccount(
   if (!projectId) issues.push("project_id 없음");
   if (!clientEmail) issues.push("client_email 없음");
   if (!privateKey?.includes("BEGIN PRIVATE KEY")) {
-    issues.push("private_key 형식이 올바르지 않음");
+    issues.push("private_key에 -----BEGIN PRIVATE KEY----- 가 없음");
+  }
+  if (privateKey && !privateKey.includes("END PRIVATE KEY")) {
+    issues.push("private_key에 -----END PRIVATE KEY----- 가 없음");
   }
 
   return issues;
