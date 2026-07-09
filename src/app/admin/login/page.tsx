@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { getFirebaseAuth } from "@/lib/firebase/client";
+import { getFirebaseAuthAsync } from "@/lib/firebase/client";
 import { FadeIn } from "@/components/FadeIn";
 
 function LoginForm() {
@@ -25,7 +25,7 @@ function LoginForm() {
     setLoading(true);
     setError(null);
 
-    const auth = getFirebaseAuth();
+    const auth = await getFirebaseAuthAsync();
 
     try {
       const credential = await signInWithEmailAndPassword(

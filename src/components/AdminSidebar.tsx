@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "firebase/auth";
 import { LayoutDashboard, Film, LogOut, Users, Settings } from "lucide-react";
-import { getFirebaseAuth } from "@/lib/firebase/client";
+import { getFirebaseAuthAsync } from "@/lib/firebase/client";
 
 const navItems = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -19,7 +19,7 @@ export function AdminSidebar() {
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
-    await signOut(getFirebaseAuth());
+    await signOut(await getFirebaseAuthAsync());
     router.push("/admin/login");
     router.refresh();
   }
