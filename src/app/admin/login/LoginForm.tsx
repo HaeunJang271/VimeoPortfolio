@@ -2,18 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { signInWithEmailAndPassword, signOut } from "firebase/auth";
-import {
-  getFirebaseAuthAsync,
-  type FirebaseClientConfig,
-} from "@/lib/firebase/client";
 import { FadeIn } from "@/components/FadeIn";
 
-interface LoginFormProps {
-  firebaseConfig: FirebaseClientConfig;
-}
-
-export function LoginForm({ firebaseConfig }: LoginFormProps) {
+export function LoginForm() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,35 +24,22 @@ export function LoginForm({ firebaseConfig }: LoginFormProps) {
     setError(null);
 
     try {
-      const auth = await getFirebaseAuthAsync(firebaseConfig);
-      const credential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const idToken = await credential.user.getIdToken();
-
-      const res = await fetch("/api/auth/session", {
+      const res = await fetch("/api/auth/login", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken }),
+        body: JSON.stringify({ email, password }),
       });
 
+      const data = (await res.json()) as { error?: string };
+
       if (!res.ok) {
-        const data = await res.json();
-        await signOut(auth);
-
-        if (res.status === 403) {
-          throw new Error("관리자 권한이 없습니다.");
-        }
-
-        throw new Error(data.error ?? "Failed to create session");
+        throw new Error(data.error ?? "로그인에 실패했습니다.");
       }
 
       window.location.assign("/admin/dashboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Sign in failed");
+      setError(err instanceof Error ? err.message : "로그인에 실패했습니다.");
       setLoading(false);
     }
   }

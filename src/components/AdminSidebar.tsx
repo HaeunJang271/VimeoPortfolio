@@ -2,9 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut } from "firebase/auth";
 import { LayoutDashboard, Film, LogOut, Users, Settings } from "lucide-react";
-import { getFirebaseAuthAsync } from "@/lib/firebase/client";
 
 const navItems = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -18,11 +16,6 @@ export function AdminSidebar() {
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
-    try {
-      await signOut(await getFirebaseAuthAsync());
-    } catch {
-      // Firebase client may not be initialized
-    }
     window.location.assign("/admin/login");
   }
 
