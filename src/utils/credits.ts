@@ -7,6 +7,15 @@ export function normalizeCredit(credit: Partial<Credit> | null | undefined): Cre
   };
 }
 
+export function formatCreditLine(credit: Credit): string {
+  const role = credit.role.trim();
+  const name = credit.name.trim();
+
+  if (!role) return name;
+  if (!name) return role;
+  return `${role} ㅣ ${name}`;
+}
+
 export function normalizeCredits(
   credits: Array<Partial<Credit> | null | undefined> | null | undefined
 ): Credit[] {

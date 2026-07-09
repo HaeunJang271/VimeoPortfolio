@@ -3,12 +3,18 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SITE_NAME } from "@/utils/constants";
-import { isDirectorDetailPage, isMarketingListPage } from "@/utils/routes";
+import { isDirectorDetailPage, isMarketingListPage, isWorkDetailPage } from "@/utils/routes";
 
 export function Footer() {
   const pathname = usePathname();
 
-  if (pathname === "/" || isDirectorDetailPage(pathname)) return null;
+  if (
+    pathname === "/" ||
+    isDirectorDetailPage(pathname) ||
+    isWorkDetailPage(pathname)
+  ) {
+    return null;
+  }
 
   return (
     <footer className="border-t border-white/10 bg-black/96">

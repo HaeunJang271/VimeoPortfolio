@@ -2,6 +2,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { docToWork, WORKS_COLLECTION } from "@/lib/firebase/firestore";
 import type { Work, WorkFormData } from "@/types/work";
+import { sortWorksByOrder } from "@/utils/work-order";
 
 function isFirebaseConfigured(): boolean {
   return !!(
@@ -136,15 +137,23 @@ export function getAdjacentWorks(
 export function getRelatedWorksByDirector(
   works: Work[],
   currentWork: Work,
-  limit = 3
+  directorWorkOrders: Record<string, string[]> = {},
+  limit = 6
 ): Work[] {
-  return works
-    .filter(
-      (work) =>
-        work.id !== currentWork.id &&
-        work.directorIds.some((directorId) =>
-          currentWork.directorIds.includes(directorId)
-        )
-    )
-    .slice(0, limit);
+  const sharedDirectorIds = currentWork.directorIds;
+
+  if (sharedDirectorIds.length === 0) return [];
+
+  const related = works.filter(
+    (work) =>
+      work.id !== currentWork.id &&
+      work.directorIds.some((directorId) =>
+        sharedDirectorIds.includes(directorId)
+      )
+  );
+
+  const primaryDirectorId = sharedDirectorIds[0];
+  const workOrder = directorWorkOrders[primaryDirectorId] ?? [];
+
+  return sortWorksByOrder(related, workOrder).slice(0, limit);
 }

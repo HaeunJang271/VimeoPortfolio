@@ -321,14 +321,14 @@ export function ProjectForm({
             <div key={index} className="flex gap-3">
               <input
                 type="text"
-                placeholder="Role"
+                placeholder="Director"
                 value={credit.role ?? ""}
                 onChange={(e) => updateCredit(index, "role", e.target.value)}
                 className="flex-1 border border-white/10 bg-transparent px-4 py-2 text-sm text-white outline-none focus:border-white/30"
               />
               <input
                 type="text"
-                placeholder="Name"
+                placeholder="Jan'Qui"
                 value={credit.name ?? ""}
                 onChange={(e) => updateCredit(index, "name", e.target.value)}
                 className="flex-1 border border-white/10 bg-transparent px-4 py-2 text-sm text-white outline-none focus:border-white/30"
