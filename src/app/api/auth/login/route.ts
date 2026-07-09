@@ -8,6 +8,7 @@ import {
 import { getFirebaseConfigFromEnv } from "@/lib/firebase/server-config";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 interface FirebaseSignInResponse {
   idToken?: string;
@@ -54,7 +55,17 @@ export async function POST(request: Request) {
       }
     );
 
-    const signInData = (await signInRes.json()) as FirebaseSignInResponse;
+    const signInText = await signInRes.text();
+    let signInData: FirebaseSignInResponse;
+
+    try {
+      signInData = JSON.parse(signInText) as FirebaseSignInResponse;
+    } catch {
+      return NextResponse.json(
+        { error: "Firebase 인증 서버 응답 오류입니다. API Key를 확인하세요." },
+        { status: 502 }
+      );
+    }
 
     if (!signInRes.ok || !signInData.idToken) {
       const message = signInData.error?.message ?? "";

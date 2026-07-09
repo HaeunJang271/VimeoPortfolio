@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { FadeIn } from "@/components/FadeIn";
+import { readJsonResponse } from "@/utils/http";
 
 export function LoginForm() {
   const searchParams = useSearchParams();
@@ -31,7 +32,7 @@ export function LoginForm() {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = (await res.json()) as { error?: string };
+      const data = await readJsonResponse<{ error?: string }>(res);
 
       if (!res.ok) {
         throw new Error(data.error ?? "로그인에 실패했습니다.");

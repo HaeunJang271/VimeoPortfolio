@@ -5,6 +5,8 @@ import {
   SESSION_COOKIE_NAME,
 } from "@/lib/firebase/admin";
 
+export const runtime = "nodejs";
+
 export async function POST() {
   try {
     const cookieStore = await cookies();

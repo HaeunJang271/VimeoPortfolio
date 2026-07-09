@@ -6,6 +6,8 @@ import {
   SESSION_EXPIRES_IN,
 } from "@/lib/firebase/admin";
 
+export const runtime = "nodejs";
+
 export async function POST(request: Request) {
   try {
     const { idToken } = await request.json();
