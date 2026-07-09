@@ -21,7 +21,11 @@ function loadServiceAccountFromFile(): Record<string, string> | null {
     return null;
   }
 
-  return JSON.parse(readFileSync(resolved, "utf8"));
+  try {
+    return JSON.parse(readFileSync(resolved, "utf8"));
+  } catch {
+    return null;
+  }
 }
 
 function parseServiceAccountJson(raw: string): Record<string, string> | null {
@@ -107,6 +111,20 @@ export function getFirebaseAdminHealth(): {
       "Firebase Admin 키 없음: FIREBASE_SERVICE_ACCOUNT_KEY 또는 FIREBASE_PROJECT_ID + FIREBASE_CLIENT_EMAIL + FIREBASE_PRIVATE_KEY 필요"
     );
     return { hasCredentials: false, initOk: false, issues };
+  }
+
+  const projectId = serviceAccount.project_id ?? serviceAccount.projectId;
+  const clientEmail = serviceAccount.client_email ?? serviceAccount.clientEmail;
+  const privateKey = serviceAccount.private_key ?? serviceAccount.privateKey;
+
+  if (!projectId) issues.push("project_id 없음");
+  if (!clientEmail) issues.push("client_email 없음");
+  if (!privateKey?.includes("BEGIN PRIVATE KEY")) {
+    issues.push("private_key 형식이 올바르지 않음");
+  }
+
+  if (issues.length > 0) {
+    return { hasCredentials: true, initOk: false, issues };
   }
 
   try {

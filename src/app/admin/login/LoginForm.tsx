@@ -19,19 +19,20 @@ export function LoginForm() {
     }
 
     void fetch("/api/auth/status", { cache: "no-store" })
-      .then((res) => res.json())
-      .then(
-        (data: {
+      .then(async (res) => {
+        const data = await readJsonResponse<{
           ready?: boolean;
           issues?: string[];
-        }) => {
-          if (!data.ready && data.issues?.length) {
-            setError(data.issues.join(" / "));
-          }
+        }>(res);
+
+        if (!data.ready && data.issues?.length) {
+          setError(data.issues.join(" / "));
         }
-      )
-      .catch(() => {
-        setError("서버 설정 상태를 확인하지 못했습니다.");
+      })
+      .catch((err) => {
+        if (err instanceof Error) {
+          setError(err.message);
+        }
       });
   }, [searchParams]);
 

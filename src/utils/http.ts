@@ -9,7 +9,7 @@ export async function readJsonResponse<T>(res: Response): Promise<T> {
 
   if (text.trimStart().startsWith("<")) {
     throw new Error(
-      "서버 API 응답 오류입니다. 배포가 완료됐는지 확인하고, Vercel 빌드가 성공했는지 확인하세요."
+      "서버 API가 HTML을 반환했습니다. Vercel Deployment Protection을 끄거나 Production URL로 접속하세요."
     );
   }
 
