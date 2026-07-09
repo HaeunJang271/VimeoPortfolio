@@ -11,8 +11,8 @@ export default async function WorkPage() {
   const works = await getWorks();
 
   return (
-    <main className="min-h-screen">
-      <div className="mx-auto max-w-7xl px-6 pb-24 pt-10 md:px-10 md:pb-32 md:pt-16">
+    <main className="min-h-dvh">
+      <div className="mx-auto max-w-7xl px-6 pb-40 pt-28 md:px-10 md:pb-44 md:pt-32">
         <FadeIn>
           <h1 className="mb-12 text-xs tracking-[0.3em] text-white/40 md:mb-16">
             WORK

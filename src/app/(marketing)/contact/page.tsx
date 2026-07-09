@@ -10,8 +10,8 @@ export default async function ContactPage() {
   const settings = await getSiteSettings();
 
   return (
-    <main className="min-h-screen">
-      <div className="mx-auto max-w-4xl px-6 pb-24 pt-10 md:px-10 md:pb-32 md:pt-16">
+    <main className="min-h-dvh">
+      <div className="mx-auto max-w-4xl px-6 pb-40 pt-28 md:px-10 md:pb-44 md:pt-32">
         <FadeIn>
           <h1 className="mb-16 text-xs tracking-[0.3em] text-white/40 md:mb-24">
             CONTACT

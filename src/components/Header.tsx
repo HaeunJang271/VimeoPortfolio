@@ -4,17 +4,32 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { SITE_NAME } from "@/utils/constants";
+import { isMarketingListPage } from "@/utils/routes";
 
 const navItems = [
   { href: "/directors", label: "DIRECTORS" },
   { href: "/work", label: "WORK" },
   { href: "/contact", label: "CONTACT" },
-];
+] as const;
+
+const navLinkClass =
+  "text-xs font-medium tracking-[0.2em] text-white transition-opacity hover:opacity-60 md:text-sm";
+
+function isNavActive(href: string, pathname: string): boolean {
+  if (href === "/directors") {
+    return pathname === "/directors" || pathname.startsWith("/directors/");
+  }
+  if (href === "/work") {
+    return pathname === "/work" || pathname.startsWith("/work/");
+  }
+  return pathname === href;
+}
 
 export function Header() {
   const pathname = usePathname();
+  const isListPage = isMarketingListPage(pathname);
   const isMarketingPage =
-    pathname === "/" ||
+    isListPage ||
     pathname.startsWith("/directors") ||
     pathname.startsWith("/work") ||
     pathname.startsWith("/contact");
@@ -32,30 +47,48 @@ export function Header() {
           : "bg-black/92 backdrop-blur-sm"
       }`}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 md:px-10 md:py-8">
-        <Link
-          href="/"
-          className="text-sm font-medium tracking-[0.2em] text-white transition-opacity hover:opacity-60 md:text-base"
-        >
-          {SITE_NAME}
-        </Link>
-
-        <nav className="flex items-center gap-8 md:gap-12">
+      {isListPage ? (
+        <nav className="grid grid-cols-3 items-center px-6 py-6 md:px-10 md:py-8">
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className={`text-xs font-medium tracking-[0.2em] text-white transition-opacity hover:opacity-60 md:text-sm ${
-                pathname === item.href || pathname.startsWith(`${item.href}/`)
-                  ? "opacity-100"
-                  : "opacity-70"
-              }`}
+              className={`${navLinkClass} ${
+                item.href === "/directors"
+                  ? "justify-self-start"
+                  : item.href === "/work"
+                    ? "justify-self-center"
+                    : "justify-self-end"
+              } ${isNavActive(item.href, pathname) ? "opacity-100" : "opacity-70"}`}
             >
               {item.label}
             </Link>
           ))}
         </nav>
-      </div>
+      ) : (
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 md:px-10 md:py-8">
+          <Link
+            href="/"
+            className="text-sm font-medium tracking-[0.2em] text-white transition-opacity hover:opacity-60 md:text-base"
+          >
+            {SITE_NAME}
+          </Link>
+
+          <nav className="flex items-center gap-8 md:gap-12">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`${navLinkClass} ${
+                  isNavActive(item.href, pathname) ? "opacity-100" : "opacity-70"
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      )}
     </motion.header>
   );
 }

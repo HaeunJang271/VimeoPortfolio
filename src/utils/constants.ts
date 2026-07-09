@@ -1,4 +1,5 @@
-export const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? "Studio";
+export const BRAND_NAME = "MAKMALLO";
+export const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? BRAND_NAME;
 
 export const SHOWREEL_VIMEO_ID =
   process.env.NEXT_PUBLIC_SHOWREEL_VIMEO_ID ?? "76979871";
