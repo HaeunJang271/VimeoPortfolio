@@ -1,36 +1,70 @@
 import { NextResponse } from "next/server";
 import { getFirebaseConfigFromEnv } from "@/lib/firebase/server-config";
+import {
+  getServiceAccount,
+  validateServiceAccount,
+} from "@/lib/firebase/admin-credentials";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function GET() {
-  try {
-    const { getFirebaseAdminHealth } = await import("@/lib/firebase/admin");
-    const clientConfig = getFirebaseConfigFromEnv();
-    const adminHealth = getFirebaseAdminHealth();
+  const clientConfig = getFirebaseConfigFromEnv();
+  const issues: string[] = [];
+  const serviceAccount = getServiceAccount();
+
+  if (!clientConfig) {
+    issues.push("NEXT_PUBLIC_FIREBASE_* 환경변수 6개 필요");
+  }
+
+  if (!serviceAccount) {
+    issues.push(
+      "Firebase Admin 키 없음: FIREBASE_PROJECT_ID + FIREBASE_CLIENT_EMAIL + FIREBASE_PRIVATE_KEY 필요"
+    );
 
     return NextResponse.json({
       clientConfig: !!clientConfig,
-      adminCredentials: adminHealth.hasCredentials,
-      adminInit: adminHealth.initOk,
-      issues: adminHealth.issues,
-      ready: !!clientConfig && adminHealth.initOk,
+      adminCredentials: false,
+      adminInit: false,
+      issues,
+      ready: false,
+    });
+  }
+
+  issues.push(...validateServiceAccount(serviceAccount));
+
+  if (issues.length > 0) {
+    return NextResponse.json({
+      clientConfig: !!clientConfig,
+      adminCredentials: true,
+      adminInit: false,
+      issues,
+      ready: false,
+    });
+  }
+
+  try {
+    const { getAdminAuth } = await import("@/lib/firebase/admin");
+    getAdminAuth();
+
+    return NextResponse.json({
+      clientConfig: !!clientConfig,
+      adminCredentials: true,
+      adminInit: true,
+      issues: [],
+      ready: !!clientConfig,
     });
   } catch (error) {
-    return NextResponse.json(
-      {
-        clientConfig: false,
-        adminCredentials: false,
-        adminInit: false,
-        issues: [
-          error instanceof Error
-            ? error.message
-            : "서버 상태 확인 중 오류가 발생했습니다.",
-        ],
-        ready: false,
-      },
-      { status: 500 }
+    issues.push(
+      error instanceof Error ? error.message : "Firebase Admin 초기화 실패"
     );
+
+    return NextResponse.json({
+      clientConfig: !!clientConfig,
+      adminCredentials: true,
+      adminInit: false,
+      issues,
+      ready: false,
+    });
   }
 }
