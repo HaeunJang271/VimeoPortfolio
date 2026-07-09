@@ -1,5 +1,6 @@
 export const BRAND_NAME = "MAKMALLO";
 export const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? BRAND_NAME;
+export const COPYRIGHT_HOLDER = "개발하는컴공과지망생";
 
 export const SHOWREEL_VIMEO_ID =
   process.env.NEXT_PUBLIC_SHOWREEL_VIMEO_ID ?? "76979871";
