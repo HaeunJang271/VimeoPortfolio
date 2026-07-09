@@ -1,10 +1,14 @@
 import Link from "next/link";
-import { Film, Plus } from "lucide-react";
+import { Film, Plus, Users } from "lucide-react";
 import { AdminSidebar } from "@/components/AdminSidebar";
+import { getDirectors } from "@/services/directors";
+import { getSiteSettings } from "@/services/settings";
 import { getWorks } from "@/services/works";
 
 export default async function AdminDashboardPage() {
   const works = await getWorks();
+  const directors = await getDirectors();
+  const settings = await getSiteSettings();
 
   return (
     <div className="flex min-h-screen bg-black">
@@ -17,12 +21,25 @@ export default async function AdminDashboardPage() {
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-3">
           <StatCard
             icon={<Film size={20} />}
             label="Total Works"
             value={works.length.toString()}
           />
+          <StatCard
+            icon={<Users size={20} />}
+            label="Total Directors"
+            value={directors.length.toString()}
+          />
+          <StatCard
+            icon={<Film size={20} />}
+            label="Showreel"
+            value={settings.homepageShowreel ? "Connected" : "Missing"}
+          />
+        </div>
+
+        <div className="mt-8 grid gap-6 md:grid-cols-3">
           <Link
             href="/admin/works/new"
             className="flex items-center justify-between border border-white/10 p-6 transition-colors hover:border-white/30"
@@ -32,6 +49,30 @@ export default async function AdminDashboardPage() {
                 QUICK ACTION
               </p>
               <p className="mt-2 text-sm text-white">Add New Work</p>
+            </div>
+            <Plus size={20} className="text-white/40" />
+          </Link>
+          <Link
+            href="/admin/directors/new"
+            className="flex items-center justify-between border border-white/10 p-6 transition-colors hover:border-white/30"
+          >
+            <div>
+              <p className="text-xs tracking-[0.15em] text-white/40">
+                QUICK ACTION
+              </p>
+              <p className="mt-2 text-sm text-white">Add New Director</p>
+            </div>
+            <Plus size={20} className="text-white/40" />
+          </Link>
+          <Link
+            href="/admin/settings"
+            className="flex items-center justify-between border border-white/10 p-6 transition-colors hover:border-white/30"
+          >
+            <div>
+              <p className="text-xs tracking-[0.15em] text-white/40">
+                QUICK ACTION
+              </p>
+              <p className="mt-2 text-sm text-white">Update Site Settings</p>
             </div>
             <Plus size={20} className="text-white/40" />
           </Link>

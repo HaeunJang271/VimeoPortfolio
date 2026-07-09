@@ -12,5 +12,15 @@ service firebase.storage {
       allow read: if true;
       allow write: if isAdmin();
     }
+
+    match /directors/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /logos/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
   }
 }

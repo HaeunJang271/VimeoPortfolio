@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "firebase/auth";
-import { LayoutDashboard, Film, LogOut } from "lucide-react";
+import { LayoutDashboard, Film, LogOut, Users, Settings } from "lucide-react";
 import { getFirebaseAuth } from "@/lib/firebase/client";
 
 const navItems = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/directors", label: "Directors", icon: Users },
   { href: "/admin/works", label: "Works", icon: Film },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
 export function AdminSidebar() {

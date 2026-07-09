@@ -1,0 +1,133 @@
+import { FieldValue } from "firebase-admin/firestore";
+import { getAdminDb } from "@/lib/firebase/admin";
+import {
+  DIRECTORS_COLLECTION,
+  docToDirector,
+  docToWork,
+  WORKS_COLLECTION,
+} from "@/lib/firebase/firestore";
+import type { Director, DirectorFormData } from "@/types/director";
+import type { Work } from "@/types/work";
+
+function isFirebaseConfigured(): boolean {
+  return !!(
+    process.env.FIREBASE_SERVICE_ACCOUNT_PATH ||
+    process.env.FIREBASE_SERVICE_ACCOUNT_KEY ||
+    (process.env.FIREBASE_PROJECT_ID &&
+      process.env.FIREBASE_CLIENT_EMAIL &&
+      process.env.FIREBASE_PRIVATE_KEY)
+  );
+}
+
+export async function getDirectors(): Promise<Director[]> {
+  if (!isFirebaseConfigured()) return [];
+
+  try {
+    const snapshot = await getAdminDb()
+      .collection(DIRECTORS_COLLECTION)
+      .orderBy("displayOrder", "asc")
+      .get();
+
+    return snapshot.docs.map((doc) => docToDirector(doc.id, doc.data()));
+  } catch (error) {
+    console.error("Failed to fetch directors:", error);
+    return [];
+  }
+}
+
+export async function getDirectorBySlug(slug: string): Promise<Director | null> {
+  if (!isFirebaseConfigured()) return null;
+
+  try {
+    const snapshot = await getAdminDb()
+      .collection(DIRECTORS_COLLECTION)
+      .where("slug", "==", slug)
+      .limit(1)
+      .get();
+
+    if (snapshot.empty) return null;
+
+    const doc = snapshot.docs[0];
+    return docToDirector(doc.id, doc.data());
+  } catch (error) {
+    console.error("Failed to fetch director by slug:", error);
+    return null;
+  }
+}
+
+export async function getDirectorById(id: string): Promise<Director | null> {
+  if (!isFirebaseConfigured()) return null;
+
+  try {
+    const doc = await getAdminDb()
+      .collection(DIRECTORS_COLLECTION)
+      .doc(id)
+      .get();
+
+    if (!doc.exists) return null;
+    return docToDirector(doc.id, doc.data()!);
+  } catch (error) {
+    console.error("Failed to fetch director by id:", error);
+    return null;
+  }
+}
+
+export async function createDirector(
+  formData: DirectorFormData
+): Promise<Director> {
+  const docRef = await getAdminDb()
+    .collection(DIRECTORS_COLLECTION)
+    .add({
+      name: formData.name,
+      slug: formData.slug,
+      profileImage: formData.profileImage || null,
+      description: formData.description,
+      descriptionLinks: formData.descriptionLinks,
+      displayOrder: formData.displayOrder,
+      createdAt: FieldValue.serverTimestamp(),
+    });
+
+  const doc = await docRef.get();
+  return docToDirector(doc.id, doc.data()!);
+}
+
+export async function updateDirector(
+  id: string,
+  formData: DirectorFormData
+): Promise<Director> {
+  const docRef = getAdminDb().collection(DIRECTORS_COLLECTION).doc(id);
+
+  await docRef.update({
+    name: formData.name,
+    slug: formData.slug,
+    profileImage: formData.profileImage || null,
+    description: formData.description,
+    descriptionLinks: formData.descriptionLinks,
+    displayOrder: formData.displayOrder,
+  });
+
+  const doc = await docRef.get();
+  return docToDirector(doc.id, doc.data()!);
+}
+
+export async function deleteDirector(id: string): Promise<void> {
+  await getAdminDb().collection(DIRECTORS_COLLECTION).doc(id).delete();
+}
+
+export async function getWorksByDirectorId(directorId: string): Promise<Work[]> {
+  if (!isFirebaseConfigured()) return [];
+
+  try {
+    const snapshot = await getAdminDb()
+      .collection(WORKS_COLLECTION)
+      .where("directorIds", "array-contains", directorId)
+      .get();
+
+    return snapshot.docs
+      .map((doc) => docToWork(doc.id, doc.data()))
+      .sort((a, b) => a.displayOrder - b.displayOrder);
+  } catch (error) {
+    console.error("Failed to fetch works by director:", error);
+    return [];
+  }
+}

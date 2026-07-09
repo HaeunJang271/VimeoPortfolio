@@ -8,13 +8,20 @@ export async function POST(request: Request) {
 
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
+    const folder = (formData.get("folder") as string | null) ?? "thumbnails";
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
+    if (!["thumbnails", "directors", "logos"].includes(folder)) {
+      return NextResponse.json({ error: "Invalid folder" }, { status: 400 });
+    }
+
     const ext = file.name.split(".").pop() ?? "jpg";
-    const fileName = `thumbnails/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const fileName = `${folder}/${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2)}.${ext}`;
     const buffer = Buffer.from(await file.arrayBuffer());
 
     const bucket = getAdminStorage().bucket();

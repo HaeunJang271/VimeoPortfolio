@@ -5,6 +5,7 @@ import type { Work, WorkFormData } from "@/types/work";
 
 function isFirebaseConfigured(): boolean {
   return !!(
+    process.env.FIREBASE_SERVICE_ACCOUNT_PATH ||
     process.env.FIREBASE_SERVICE_ACCOUNT_KEY ||
     (process.env.FIREBASE_PROJECT_ID &&
       process.env.FIREBASE_CLIENT_EMAIL &&
@@ -18,7 +19,7 @@ export async function getWorks(): Promise<Work[]> {
   try {
     const snapshot = await getAdminDb()
       .collection(WORKS_COLLECTION)
-      .orderBy("created_at", "desc")
+      .orderBy("displayOrder", "asc")
       .get();
 
     return snapshot.docs.map((doc) => docToWork(doc.id, doc.data()));
@@ -70,10 +71,12 @@ export async function createWork(formData: WorkFormData): Promise<Work> {
       title: formData.title,
       slug: formData.slug,
       thumbnail: formData.thumbnail || null,
-      vimeo_url: formData.vimeo_url,
+      vimeoUrl: formData.vimeoUrl,
       description: formData.description,
       credits: formData.credits,
-      created_at: FieldValue.serverTimestamp(),
+      displayOrder: formData.displayOrder,
+      directorIds: formData.directorIds,
+      createdAt: FieldValue.serverTimestamp(),
     });
 
   const doc = await docRef.get();
@@ -90,9 +93,11 @@ export async function updateWork(
     title: formData.title,
     slug: formData.slug,
     thumbnail: formData.thumbnail || null,
-    vimeo_url: formData.vimeo_url,
+    vimeoUrl: formData.vimeoUrl,
     description: formData.description,
     credits: formData.credits,
+    displayOrder: formData.displayOrder,
+    directorIds: formData.directorIds,
   });
 
   const doc = await docRef.get();
@@ -114,4 +119,20 @@ export function getAdjacentWorks(
     prev: index > 0 ? works[index - 1] : null,
     next: index < works.length - 1 ? works[index + 1] : null,
   };
+}
+
+export function getRelatedWorksByDirector(
+  works: Work[],
+  currentWork: Work,
+  limit = 3
+): Work[] {
+  return works
+    .filter(
+      (work) =>
+        work.id !== currentWork.id &&
+        work.directorIds.some((directorId) =>
+          currentWork.directorIds.includes(directorId)
+        )
+    )
+    .slice(0, limit);
 }

@@ -13,6 +13,16 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /directors/{directorId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     match /admins/{uid} {
       allow read: if request.auth != null && request.auth.uid == uid;
       allow write: if false;

@@ -1,7 +1,10 @@
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { ProjectForm } from "@/components/ProjectForm";
+import { getDirectors } from "@/services/directors";
 
-export default function NewWorkPage() {
+export default async function NewWorkPage() {
+  const directors = await getDirectors();
+
   return (
     <div className="flex min-h-screen bg-black">
       <AdminSidebar />
@@ -11,7 +14,7 @@ export default function NewWorkPage() {
           <p className="mt-2 text-sm text-white/40">Add a new project</p>
         </div>
         <div className="max-w-2xl">
-          <ProjectForm mode="create" />
+          <ProjectForm mode="create" directors={directors} />
         </div>
       </main>
     </div>

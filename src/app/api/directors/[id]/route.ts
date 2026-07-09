@@ -1,0 +1,54 @@
+import { NextResponse } from "next/server";
+import { requireAdminUser } from "@/lib/firebase/auth-server";
+import {
+  deleteDirector,
+  getDirectorById,
+  updateDirector,
+} from "@/services/directors";
+import type { DirectorFormData } from "@/types/director";
+
+interface RouteParams {
+  params: Promise<{ id: string }>;
+}
+
+export async function GET(_request: Request, { params }: RouteParams) {
+  const { id } = await params;
+  const director = await getDirectorById(id);
+
+  if (!director) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  return NextResponse.json(director);
+}
+
+export async function PUT(request: Request, { params }: RouteParams) {
+  try {
+    await requireAdminUser();
+    const { id } = await params;
+    const body = (await request.json()) as DirectorFormData;
+    const director = await updateDirector(id, body);
+    return NextResponse.json(director);
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to update director";
+    const status =
+      message === "Unauthorized" || message === "Forbidden" ? 403 : 500;
+    return NextResponse.json({ error: message }, { status });
+  }
+}
+
+export async function DELETE(_request: Request, { params }: RouteParams) {
+  try {
+    await requireAdminUser();
+    const { id } = await params;
+    await deleteDirector(id);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to delete director";
+    const status =
+      message === "Unauthorized" || message === "Forbidden" ? 403 : 500;
+    return NextResponse.json({ error: message }, { status });
+  }
+}

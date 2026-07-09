@@ -8,17 +8,21 @@ export interface Work {
   title: string;
   slug: string;
   thumbnail: string | null;
-  vimeo_url: string;
+  vimeoUrl: string;
   description: string;
   credits: Credit[];
-  created_at: string;
+  displayOrder: number;
+  directorIds: string[];
+  createdAt: string;
 }
 
 export interface WorkFormData {
   title: string;
   slug: string;
   thumbnail: string;
-  vimeo_url: string;
+  vimeoUrl: string;
   description: string;
   credits: Credit[];
+  displayOrder: number;
+  directorIds: string[];
 }

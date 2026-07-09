@@ -1,14 +1,17 @@
 # Vimeo Portfolio
 
-A minimal, premium portfolio website for a video production studio. Built with Next.js 15, Firebase, and Vimeo embeds.
+A production-ready portfolio website for a video production studio. Built with Next.js 15, Firebase, and Vimeo embeds.
 
 ## Features
 
-- Full-screen Vimeo showreel on the homepage
-- Work grid and detail pages with embedded videos
-- Contact page with environment-based contact info
+- Full-screen homepage showreel with persistent background showreel on marketing pages
+- Directors list and director detail pages
+- Work grid and work detail pages with embedded videos
+- Contact page backed by Firebase settings
 - Admin dashboard with Firebase Authentication
-- CRUD for works with thumbnail upload to Firebase Storage
+- CRUD for directors and works
+- Site settings management for showreel, contact, and logo
+- Firebase Storage upload for logos, director images, and thumbnails
 - Framer Motion animations
 - Fully responsive design
 
@@ -75,27 +78,26 @@ Open [http://localhost:3000](http://localhost:3000).
 
 | Route | Description |
 |-------|-------------|
-| `/` | Homepage with full-screen showreel |
-| `/work` | Project grid |
-| `/work/[slug]` | Project detail with video, credits, navigation |
+| `/` | Main showreel landing page |
+| `/directors` | Directors index |
+| `/directors/[slug]` | Director detail with related works |
+| `/work` | Work grid |
+| `/work/[slug]` | Work detail with credits and related projects |
 | `/contact` | Contact information |
 | `/admin/login` | Admin authentication |
-| `/admin/dashboard` | Admin dashboard |
-| `/admin/works` | Manage works (CRUD) |
+| `/admin/dashboard` | Admin overview |
+| `/admin/directors` | Directors management |
+| `/admin/works` | Works management |
+| `/admin/settings` | Showreel/contact/logo settings |
 
 ## Firestore Schema
 
-Collection: `works`
+Collections:
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `title` | string | Project title |
-| `slug` | string | URL slug (unique) |
-| `thumbnail` | string \| null | Thumbnail URL (Firebase Storage) |
-| `vimeo_url` | string | Vimeo video URL or ID |
-| `description` | string | Project description |
-| `credits` | array | `[{ role, name }]` |
-| `created_at` | timestamp | Creation timestamp |
+- `directors`
+- `works`
+- `settings`
+- `admins`
 
 See `firebase/schema.md` for full details.
 
@@ -103,11 +105,11 @@ See `firebase/schema.md` for full details.
 
 ```
 src/
-├── app/              # Next.js App Router pages & API routes
+├── app/              # Next.js App Router pages, route groups, and API routes
 ├── components/       # Reusable UI components
 ├── hooks/            # Custom React hooks
 ├── lib/firebase/     # Firebase client & admin SDK
-├── services/         # Data access layer
+├── services/         # Firestore data access layer
 ├── types/            # TypeScript types
 └── utils/            # Helper functions
 firebase/
@@ -140,8 +142,8 @@ ADMIN_EMAILS=admin@studio.com
 
 1. Go to `/admin/login`
 2. Sign in with your registered admin account
-3. Navigate to **Works** to create, edit, or delete projects
-4. Upload thumbnails directly from the work form
+3. Navigate to **Directors**, **Works**, and **Settings**
+4. Manage showreel, contact details, logo, directors, and projects
 
 ## Build
 

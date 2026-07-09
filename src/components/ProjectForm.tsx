@@ -5,16 +5,18 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2, Upload } from "lucide-react";
 import { slugify } from "@/utils/slug";
+import type { Director } from "@/types/director";
 import type { Credit, Work, WorkFormData } from "@/types/work";
 
 interface ProjectFormProps {
   work?: Work;
+  directors: Director[];
   mode: "create" | "edit";
 }
 
 const emptyCredit: Credit = { role: "", name: "" };
 
-export function ProjectForm({ work, mode }: ProjectFormProps) {
+export function ProjectForm({ work, directors, mode }: ProjectFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -24,9 +26,11 @@ export function ProjectForm({ work, mode }: ProjectFormProps) {
     title: work?.title ?? "",
     slug: work?.slug ?? "",
     thumbnail: work?.thumbnail ?? "",
-    vimeo_url: work?.vimeo_url ?? "",
+    vimeoUrl: work?.vimeoUrl ?? "",
     description: work?.description ?? "",
     credits: work?.credits?.length ? work.credits : [{ ...emptyCredit }],
+    displayOrder: work?.displayOrder ?? 0,
+    directorIds: work?.directorIds ?? [],
   });
 
   function updateField<K extends keyof WorkFormData>(
@@ -60,6 +64,16 @@ export function ProjectForm({ work, mode }: ProjectFormProps) {
     );
   }
 
+  function toggleDirector(directorId: string) {
+    const exists = form.directorIds.includes(directorId);
+    updateField(
+      "directorIds",
+      exists
+        ? form.directorIds.filter((id) => id !== directorId)
+        : [...form.directorIds, directorId]
+    );
+  }
+
   async function handleThumbnailUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -70,6 +84,7 @@ export function ProjectForm({ work, mode }: ProjectFormProps) {
     try {
       const body = new FormData();
       body.append("file", file);
+      body.append("folder", "thumbnails");
 
       const res = await fetch("/api/upload", { method: "POST", body });
       const data = await res.json();
@@ -89,7 +104,7 @@ export function ProjectForm({ work, mode }: ProjectFormProps) {
     setLoading(true);
     setError(null);
 
-    const payload = {
+    const payload: WorkFormData = {
       ...form,
       credits: form.credits.filter((c) => c.role.trim() && c.name.trim()),
     };
@@ -161,8 +176,21 @@ export function ProjectForm({ work, mode }: ProjectFormProps) {
           type="text"
           required
           placeholder="https://vimeo.com/123456789"
-          value={form.vimeo_url}
-          onChange={(e) => updateField("vimeo_url", e.target.value)}
+          value={form.vimeoUrl}
+          onChange={(e) => updateField("vimeoUrl", e.target.value)}
+          className="w-full border border-white/10 bg-transparent px-4 py-3 text-sm text-white outline-none transition-colors focus:border-white/30"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-xs tracking-[0.15em] text-white/40">
+          DISPLAY ORDER
+        </label>
+        <input
+          type="number"
+          min={0}
+          value={form.displayOrder}
+          onChange={(e) => updateField("displayOrder", Number(e.target.value))}
           className="w-full border border-white/10 bg-transparent px-4 py-3 text-sm text-white outline-none transition-colors focus:border-white/30"
         />
       </div>
@@ -194,6 +222,36 @@ export function ProjectForm({ work, mode }: ProjectFormProps) {
             disabled={uploading}
           />
         </label>
+      </div>
+
+      <div className="space-y-3">
+        <label className="text-xs tracking-[0.15em] text-white/40">
+          DIRECTORS
+        </label>
+        <div className="grid gap-3 md:grid-cols-2">
+          {directors.map((director) => {
+            const checked = form.directorIds.includes(director.id);
+
+            return (
+              <label
+                key={director.id}
+                className={`flex cursor-pointer items-center gap-3 border px-4 py-3 text-sm transition-colors ${
+                  checked
+                    ? "border-white/30 bg-white/10 text-white"
+                    : "border-white/10 text-white/60 hover:border-white/25 hover:text-white"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() => toggleDirector(director.id)}
+                  className="h-4 w-4 accent-white"
+                />
+                <span>{director.name}</span>
+              </label>
+            );
+          })}
+        </div>
       </div>
 
       <div className="space-y-2">
