@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { getFirebaseAuthAsync } from "@/lib/firebase/client";
 import { FadeIn } from "@/components/FadeIn";
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,6 +16,7 @@ function LoginForm() {
   useEffect(() => {
     if (searchParams.get("error") === "forbidden") {
       setError("관리자 권한이 없습니다. 접근이 거부되었습니다.");
+      void fetch("/api/auth/logout", { method: "POST" });
     }
   }, [searchParams]);
 
@@ -25,9 +25,8 @@ function LoginForm() {
     setLoading(true);
     setError(null);
 
-    const auth = await getFirebaseAuthAsync();
-
     try {
+      const auth = await getFirebaseAuthAsync();
       const credential = await signInWithEmailAndPassword(
         auth,
         email,
@@ -37,6 +36,7 @@ function LoginForm() {
 
       const res = await fetch("/api/auth/session", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken }),
       });
@@ -52,11 +52,11 @@ function LoginForm() {
         throw new Error(data.error ?? "Failed to create session");
       }
 
-      router.push("/admin/dashboard");
-      router.refresh();
+      // 쿠키가 적용된 뒤 이동해야 미들웨어/레이아웃 리다이렉트 루프를 피할 수 있음
+      window.location.assign("/admin/dashboard");
+      return;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Sign in failed");
-    } finally {
       setLoading(false);
     }
   }
