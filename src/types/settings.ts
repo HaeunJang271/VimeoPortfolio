@@ -3,6 +3,7 @@ export interface SiteSettings {
   contactEmail: string;
   phone: string;
   instagram: string;
+  vimeoUrl: string;
   logo: string | null;
 }
 
@@ -11,5 +12,6 @@ export interface SiteSettingsFormData {
   contactEmail: string;
   phone: string;
   instagram: string;
+  vimeoUrl: string;
   logo: string;
 }

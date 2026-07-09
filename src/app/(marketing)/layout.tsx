@@ -18,7 +18,7 @@ export default async function MarketingLayout({
       <MarketingContent>{children}</MarketingContent>
       <MarketingChrome
         instagram={settings.instagram}
-        homepageShowreel={settings.homepageShowreel}
+        vimeoUrl={settings.vimeoUrl}
       />
     </>
   );

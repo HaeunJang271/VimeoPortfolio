@@ -3,6 +3,12 @@ import type { SiteSettings } from "@/types/settings";
 import type { Credit, Work } from "@/types/work";
 import type { Timestamp } from "firebase-admin/firestore";
 import { normalizeCredits } from "@/utils/credits";
+import { extractVimeoId } from "@/utils/vimeo";
+
+function getDefaultVimeoUrl(showreel: string): string {
+  const id = extractVimeoId(showreel);
+  return id ? `https://vimeo.com/${id}` : "https://vimeo.com";
+}
 
 export const DIRECTORS_COLLECTION = "directors";
 export const WORKS_COLLECTION = "works";
@@ -56,11 +62,14 @@ export function docToDirector(
 export function docToSiteSettings(
   data: FirebaseFirestore.DocumentData | undefined
 ): SiteSettings {
+  const homepageShowreel = data?.homepageShowreel ?? "";
+
   return {
-    homepageShowreel: data?.homepageShowreel ?? "",
+    homepageShowreel,
     contactEmail: data?.contactEmail ?? "hello@studio.com",
     phone: data?.phone ?? "+1 (000) 000-0000",
     instagram: data?.instagram ?? "https://instagram.com/studio",
+    vimeoUrl: data?.vimeoUrl ?? getDefaultVimeoUrl(homepageShowreel),
     logo: data?.logo ?? null,
   };
 }

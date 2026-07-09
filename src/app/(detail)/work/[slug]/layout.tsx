@@ -13,7 +13,7 @@ export default async function WorkDetailLayout({
       {children}
       <MarketingChrome
         instagram={settings.instagram}
-        homepageShowreel={settings.homepageShowreel}
+        vimeoUrl={settings.vimeoUrl}
       />
     </>
   );

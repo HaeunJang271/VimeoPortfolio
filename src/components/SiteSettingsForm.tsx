@@ -20,6 +20,7 @@ export function SiteSettingsForm({ settings }: SiteSettingsFormProps) {
     contactEmail: settings.contactEmail,
     phone: settings.phone,
     instagram: settings.instagram,
+    vimeoUrl: settings.vimeoUrl,
     logo: settings.logo ?? "",
   });
 
@@ -145,6 +146,19 @@ export function SiteSettingsForm({ settings }: SiteSettingsFormProps) {
           autoComplete="off"
           value={form.instagram}
           onChange={(e) => updateField("instagram", e.target.value)}
+          className="w-full border border-white/10 bg-transparent px-4 py-3 text-sm text-white outline-none focus:border-white/30"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-xs tracking-[0.15em] text-white/40">VIMEO</label>
+        <input
+          type="text"
+          required
+          autoComplete="off"
+          placeholder="https://vimeo.com/..."
+          value={form.vimeoUrl}
+          onChange={(e) => updateField("vimeoUrl", e.target.value)}
           className="w-full border border-white/10 bg-transparent px-4 py-3 text-sm text-white outline-none focus:border-white/30"
         />
       </div>

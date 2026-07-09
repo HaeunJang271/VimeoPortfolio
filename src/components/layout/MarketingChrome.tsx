@@ -3,7 +3,6 @@ import { Bebas_Neue } from "next/font/google";
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
 import { VimeoIcon } from "@/components/icons/VimeoIcon";
 import { BRAND_NAME } from "@/utils/constants";
-import { extractVimeoId } from "@/utils/vimeo";
 
 const bebasNeue = Bebas_Neue({
   weight: "400",
@@ -13,20 +12,13 @@ const bebasNeue = Bebas_Neue({
 
 interface MarketingChromeProps {
   instagram: string;
-  homepageShowreel: string;
-}
-
-function getVimeoLink(showreel: string): string {
-  const id = extractVimeoId(showreel);
-  return id ? `https://vimeo.com/${id}` : "https://vimeo.com";
+  vimeoUrl: string;
 }
 
 export function MarketingChrome({
   instagram,
-  homepageShowreel,
+  vimeoUrl,
 }: MarketingChromeProps) {
-  const vimeoLink = getVimeoLink(homepageShowreel);
-
   return (
     <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-40">
       <div className="flex w-full items-end justify-between px-6 pb-8 md:px-10 md:pb-10">
@@ -55,7 +47,7 @@ export function MarketingChrome({
             </a>
           ) : null}
           <a
-            href={vimeoLink}
+            href={vimeoUrl}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Vimeo"
