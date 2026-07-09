@@ -1,7 +1,8 @@
 import type { Director } from "@/types/director";
 import type { SiteSettings } from "@/types/settings";
-import type { Work } from "@/types/work";
+import type { Credit, Work } from "@/types/work";
 import type { Timestamp } from "firebase-admin/firestore";
+import { normalizeCredits } from "@/utils/credits";
 
 export const DIRECTORS_COLLECTION = "directors";
 export const WORKS_COLLECTION = "works";
@@ -26,7 +27,7 @@ export function docToWork(
     thumbnail: data.thumbnail ?? null,
     vimeoUrl: data.vimeoUrl ?? "",
     description: data.description ?? "",
-    credits: data.credits ?? [],
+    credits: normalizeCredits(data.credits),
     displayOrder: data.displayOrder ?? 0,
     directorIds: data.directorIds ?? [],
     createdAt: timestampToIso(createdAt),
@@ -46,6 +47,7 @@ export function docToDirector(
     profileImage: data.profileImage ?? null,
     description: data.description ?? "",
     descriptionLinks: data.descriptionLinks ?? [],
+    workOrder: data.workOrder ?? [],
     displayOrder: data.displayOrder ?? 0,
     createdAt: timestampToIso(createdAt),
   };

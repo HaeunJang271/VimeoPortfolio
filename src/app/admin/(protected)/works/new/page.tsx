@@ -2,8 +2,16 @@ import { AdminSidebar } from "@/components/AdminSidebar";
 import { ProjectForm } from "@/components/ProjectForm";
 import { getDirectors } from "@/services/directors";
 
-export default async function NewWorkPage() {
+interface NewWorkPageProps {
+  searchParams: Promise<{ directorId?: string }>;
+}
+
+export default async function NewWorkPage({ searchParams }: NewWorkPageProps) {
+  const { directorId } = await searchParams;
   const directors = await getDirectors();
+  const returnTo = directorId
+    ? `/admin/directors/${directorId}/edit`
+    : undefined;
 
   return (
     <div className="flex min-h-screen bg-black">
@@ -14,7 +22,12 @@ export default async function NewWorkPage() {
           <p className="mt-2 text-sm text-white/40">Add a new project</p>
         </div>
         <div className="max-w-2xl">
-          <ProjectForm mode="create" directors={directors} />
+          <ProjectForm
+            mode="create"
+            directors={directors}
+            initialDirectorIds={directorId ? [directorId] : []}
+            returnTo={returnTo}
+          />
         </div>
       </main>
     </div>

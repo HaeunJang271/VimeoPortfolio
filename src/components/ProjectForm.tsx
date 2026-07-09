@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2, Upload } from "lucide-react";
 import { slugify } from "@/utils/slug";
+import { normalizeCredit, normalizeCredits } from "@/utils/credits";
 import type { Director } from "@/types/director";
 import type { Credit, Work, WorkFormData } from "@/types/work";
 
@@ -12,11 +13,19 @@ interface ProjectFormProps {
   work?: Work;
   directors: Director[];
   mode: "create" | "edit";
+  initialDirectorIds?: string[];
+  returnTo?: string;
 }
 
 const emptyCredit: Credit = { role: "", name: "" };
 
-export function ProjectForm({ work, directors, mode }: ProjectFormProps) {
+export function ProjectForm({
+  work,
+  directors,
+  mode,
+  initialDirectorIds = [],
+  returnTo,
+}: ProjectFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -28,9 +37,13 @@ export function ProjectForm({ work, directors, mode }: ProjectFormProps) {
     thumbnail: work?.thumbnail ?? "",
     vimeoUrl: work?.vimeoUrl ?? "",
     description: work?.description ?? "",
-    credits: work?.credits?.length ? work.credits : [{ ...emptyCredit }],
+    credits: work?.credits?.length
+      ? work.credits.map((credit) => normalizeCredit(credit))
+      : [{ ...emptyCredit }],
     displayOrder: work?.displayOrder ?? 0,
-    directorIds: work?.directorIds ?? [],
+    directorIds:
+      work?.directorIds ??
+      (initialDirectorIds.length > 0 ? initialDirectorIds : []),
   });
 
   function updateField<K extends keyof WorkFormData>(
@@ -49,7 +62,7 @@ export function ProjectForm({ work, directors, mode }: ProjectFormProps) {
 
   function updateCredit(index: number, field: keyof Credit, value: string) {
     const credits = [...form.credits];
-    credits[index] = { ...credits[index], [field]: value };
+    credits[index] = normalizeCredit({ ...credits[index], [field]: value });
     updateField("credits", credits);
   }
 
@@ -106,7 +119,7 @@ export function ProjectForm({ work, directors, mode }: ProjectFormProps) {
 
     const payload: WorkFormData = {
       ...form,
-      credits: form.credits.filter((c) => c.role.trim() && c.name.trim()),
+      credits: normalizeCredits(form.credits),
     };
 
     try {
@@ -123,7 +136,29 @@ export function ProjectForm({ work, directors, mode }: ProjectFormProps) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Save failed");
 
-      router.push("/admin/works");
+      if (
+        mode === "create" &&
+        initialDirectorIds.length === 1 &&
+        data.id
+      ) {
+        const directorId = initialDirectorIds[0];
+        const directorRes = await fetch(`/api/directors/${directorId}`);
+        const director = await directorRes.json();
+
+        if (directorRes.ok) {
+          const workOrder = [
+            ...(director.workOrder ?? []),
+            data.id as string,
+          ];
+          await fetch(`/api/directors/${directorId}/work-order`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ workOrder }),
+          });
+        }
+      }
+
+      router.push(returnTo ?? "/admin/works");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Save failed");
@@ -287,14 +322,14 @@ export function ProjectForm({ work, directors, mode }: ProjectFormProps) {
               <input
                 type="text"
                 placeholder="Role"
-                value={credit.role}
+                value={credit.role ?? ""}
                 onChange={(e) => updateCredit(index, "role", e.target.value)}
                 className="flex-1 border border-white/10 bg-transparent px-4 py-2 text-sm text-white outline-none focus:border-white/30"
               />
               <input
                 type="text"
                 placeholder="Name"
-                value={credit.name}
+                value={credit.name ?? ""}
                 onChange={(e) => updateCredit(index, "name", e.target.value)}
                 className="flex-1 border border-white/10 bg-transparent px-4 py-2 text-sm text-white outline-none focus:border-white/30"
               />
@@ -322,7 +357,7 @@ export function ProjectForm({ work, directors, mode }: ProjectFormProps) {
         </button>
         <button
           type="button"
-          onClick={() => router.push("/admin/works")}
+          onClick={() => router.push(returnTo ?? "/admin/works")}
           className="border border-white/10 px-8 py-3 text-sm tracking-[0.1em] text-white/60 transition-colors hover:border-white/30 hover:text-white"
         >
           Cancel

@@ -10,6 +10,7 @@ export interface Director {
   profileImage: string | null;
   description: string;
   descriptionLinks: DirectorDescriptionLink[];
+  workOrder: string[];
   displayOrder: number;
   createdAt: string;
 }
@@ -20,5 +21,6 @@ export interface DirectorFormData {
   profileImage: string;
   description: string;
   descriptionLinks: DirectorDescriptionLink[];
+  workOrder: string[];
   displayOrder: number;
 }

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { SITE_NAME } from "@/utils/constants";
-import { isMarketingListPage } from "@/utils/routes";
+import { isMarketingListPage, isSiteChromePage } from "@/utils/routes";
 
 const navItems = [
   { href: "/directors", label: "DIRECTORS" },
@@ -27,14 +27,8 @@ function isNavActive(href: string, pathname: string): boolean {
 
 export function Header() {
   const pathname = usePathname();
-  const isListPage = isMarketingListPage(pathname);
-  const isMarketingPage =
-    isListPage ||
-    pathname.startsWith("/directors") ||
-    pathname.startsWith("/work") ||
-    pathname.startsWith("/contact");
-  const isDetailPage =
-    pathname.startsWith("/directors/") || pathname.startsWith("/work/");
+  const isChromePage = isSiteChromePage(pathname);
+  const isShowreelPage = isMarketingListPage(pathname);
 
   return (
     <motion.header
@@ -42,12 +36,10 @@ export function Header() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed top-0 left-0 right-0 z-50 ${
-        isMarketingPage && !isDetailPage
-          ? "mix-blend-difference"
-          : "bg-black/92 backdrop-blur-sm"
+        isShowreelPage ? "mix-blend-difference" : "bg-black/92 backdrop-blur-sm"
       }`}
     >
-      {isListPage ? (
+      {isChromePage ? (
         <nav className="grid grid-cols-3 items-center px-6 py-6 md:px-10 md:py-8">
           {navItems.map((item) => (
             <Link

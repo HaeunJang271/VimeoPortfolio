@@ -31,6 +31,7 @@ export function DirectorForm({ director, mode }: DirectorFormProps) {
     descriptionLinks: director?.descriptionLinks?.length
       ? director.descriptionLinks
       : [{ ...emptyLink }],
+    workOrder: director?.workOrder ?? [],
     displayOrder: director?.displayOrder ?? 0,
   });
 
@@ -217,6 +218,9 @@ export function DirectorForm({ director, mode }: DirectorFormProps) {
           <label className="text-xs tracking-[0.15em] text-white/40">
             DESCRIPTION LINKS
           </label>
+          <p className="text-xs text-white/30">
+            e.g. @2eehyein → https://instagram.com/2eehyein
+          </p>
           <button
             type="button"
             onClick={addLink}

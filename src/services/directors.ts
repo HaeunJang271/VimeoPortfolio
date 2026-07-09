@@ -8,6 +8,7 @@ import {
 } from "@/lib/firebase/firestore";
 import type { Director, DirectorFormData } from "@/types/director";
 import type { Work } from "@/types/work";
+import { sortWorksByOrder } from "@/utils/work-order";
 
 function isFirebaseConfigured(): boolean {
   return !!(
@@ -83,6 +84,7 @@ export async function createDirector(
       profileImage: formData.profileImage || null,
       description: formData.description,
       descriptionLinks: formData.descriptionLinks,
+      workOrder: formData.workOrder ?? [],
       displayOrder: formData.displayOrder,
       createdAt: FieldValue.serverTimestamp(),
     });
@@ -103,6 +105,7 @@ export async function updateDirector(
     profileImage: formData.profileImage || null,
     description: formData.description,
     descriptionLinks: formData.descriptionLinks,
+    workOrder: formData.workOrder ?? [],
     displayOrder: formData.displayOrder,
   });
 
@@ -114,7 +117,22 @@ export async function deleteDirector(id: string): Promise<void> {
   await getAdminDb().collection(DIRECTORS_COLLECTION).doc(id).delete();
 }
 
-export async function getWorksByDirectorId(directorId: string): Promise<Work[]> {
+export async function updateDirectorWorkOrder(
+  id: string,
+  workOrder: string[]
+): Promise<Director> {
+  const docRef = getAdminDb().collection(DIRECTORS_COLLECTION).doc(id);
+
+  await docRef.update({ workOrder });
+
+  const doc = await docRef.get();
+  return docToDirector(doc.id, doc.data()!);
+}
+
+export async function getWorksByDirectorId(
+  directorId: string,
+  workOrder: string[] = []
+): Promise<Work[]> {
   if (!isFirebaseConfigured()) return [];
 
   try {
@@ -123,9 +141,8 @@ export async function getWorksByDirectorId(directorId: string): Promise<Work[]> 
       .where("directorIds", "array-contains", directorId)
       .get();
 
-    return snapshot.docs
-      .map((doc) => docToWork(doc.id, doc.data()))
-      .sort((a, b) => a.displayOrder - b.displayOrder);
+    const works = snapshot.docs.map((doc) => docToWork(doc.id, doc.data()));
+    return sortWorksByOrder(works, workOrder);
   } catch (error) {
     console.error("Failed to fetch works by director:", error);
     return [];

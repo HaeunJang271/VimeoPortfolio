@@ -108,6 +108,18 @@ export async function deleteWork(id: string): Promise<void> {
   await getAdminDb().collection(WORKS_COLLECTION).doc(id).delete();
 }
 
+export async function updateWorksDisplayOrder(workIds: string[]): Promise<void> {
+  const db = getAdminDb();
+  const batch = db.batch();
+
+  workIds.forEach((workId, index) => {
+    const docRef = db.collection(WORKS_COLLECTION).doc(workId);
+    batch.update(docRef, { displayOrder: index });
+  });
+
+  await batch.commit();
+}
+
 export function getAdjacentWorks(
   works: Work[],
   currentSlug: string

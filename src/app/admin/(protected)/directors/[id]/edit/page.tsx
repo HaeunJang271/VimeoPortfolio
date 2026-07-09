@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import { AdminSidebar } from "@/components/AdminSidebar";
 import { DirectorForm } from "@/components/DirectorForm";
-import { getDirectorById } from "@/services/directors";
+import { DirectorWorksManager } from "@/components/DirectorWorksManager";
+import { getDirectorById, getWorksByDirectorId } from "@/services/directors";
 
 interface EditDirectorPageProps {
   params: Promise<{ id: string }>;
@@ -15,6 +16,8 @@ export default async function EditDirectorPage({
 
   if (!director) notFound();
 
+  const works = await getWorksByDirectorId(director.id, director.workOrder);
+
   return (
     <div className="flex min-h-screen bg-black">
       <AdminSidebar />
@@ -23,8 +26,14 @@ export default async function EditDirectorPage({
           <h1 className="text-2xl font-medium text-white">Edit Director</h1>
           <p className="mt-2 text-sm text-white/40">{director.name}</p>
         </div>
-        <div className="max-w-2xl">
+        <div className="max-w-3xl">
           <DirectorForm mode="edit" director={director} />
+          <DirectorWorksManager
+            directorId={director.id}
+            directorName={director.name}
+            works={works}
+            initialWorkOrder={director.workOrder}
+          />
         </div>
       </main>
     </div>
