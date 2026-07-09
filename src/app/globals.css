@@ -31,3 +31,24 @@ body {
   background: rgba(255, 255, 255, 0.2);
   color: #ffffff;
 }
+
+.admin-number-input {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.admin-number-input::-webkit-outer-spin-button,
+.admin-number-input::-webkit-inner-spin-button {
+  -webkit-appearance: inner-spin-button;
+  margin: 0;
+  opacity: 0.85;
+  background: transparent;
+  filter: invert(1);
+  cursor: pointer;
+}
+
+.admin-number-input:hover::-webkit-outer-spin-button,
+.admin-number-input:hover::-webkit-inner-spin-button {
+  opacity: 1;
+  background: transparent;
+}

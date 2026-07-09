@@ -78,7 +78,14 @@ export function SiteSettingsForm({ settings }: SiteSettingsFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit} className="space-y-8" autoComplete="off">
+      <input
+        type="text"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="pointer-events-none absolute h-0 w-0 opacity-0"
+      />
       {error && (
         <div className="rounded-sm border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
           {error}
@@ -92,6 +99,7 @@ export function SiteSettingsForm({ settings }: SiteSettingsFormProps) {
         <input
           type="text"
           required
+          autoComplete="off"
           value={form.homepageShowreel}
           onChange={(e) => updateField("homepageShowreel", e.target.value)}
           className="w-full border border-white/10 bg-transparent px-4 py-3 text-sm text-white outline-none focus:border-white/30"
@@ -102,8 +110,11 @@ export function SiteSettingsForm({ settings }: SiteSettingsFormProps) {
         <div className="space-y-2">
           <label className="text-xs tracking-[0.15em] text-white/40">EMAIL</label>
           <input
-            type="email"
+            type="text"
             required
+            autoComplete="off"
+            data-1p-ignore
+            data-lpignore="true"
             value={form.contactEmail}
             onChange={(e) => updateField("contactEmail", e.target.value)}
             className="w-full border border-white/10 bg-transparent px-4 py-3 text-sm text-white outline-none focus:border-white/30"
@@ -114,6 +125,9 @@ export function SiteSettingsForm({ settings }: SiteSettingsFormProps) {
           <input
             type="text"
             required
+            autoComplete="off"
+            data-1p-ignore
+            data-lpignore="true"
             value={form.phone}
             onChange={(e) => updateField("phone", e.target.value)}
             className="w-full border border-white/10 bg-transparent px-4 py-3 text-sm text-white outline-none focus:border-white/30"
@@ -126,8 +140,9 @@ export function SiteSettingsForm({ settings }: SiteSettingsFormProps) {
           INSTAGRAM
         </label>
         <input
-          type="url"
+          type="text"
           required
+          autoComplete="off"
           value={form.instagram}
           onChange={(e) => updateField("instagram", e.target.value)}
           className="w-full border border-white/10 bg-transparent px-4 py-3 text-sm text-white outline-none focus:border-white/30"
@@ -152,6 +167,7 @@ export function SiteSettingsForm({ settings }: SiteSettingsFormProps) {
           <input
             type="file"
             accept="image/*"
+            autoComplete="off"
             className="hidden"
             onChange={handleLogoUpload}
             disabled={uploading}

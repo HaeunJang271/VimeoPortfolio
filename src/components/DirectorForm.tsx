@@ -131,7 +131,14 @@ export function DirectorForm({ director, mode }: DirectorFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit} className="space-y-8" autoComplete="off">
+      <input
+        type="text"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="pointer-events-none absolute h-0 w-0 opacity-0"
+      />
       {error && (
         <div className="rounded-sm border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
           {error}
@@ -144,6 +151,9 @@ export function DirectorForm({ director, mode }: DirectorFormProps) {
           <input
             type="text"
             required
+            autoComplete="off"
+            data-1p-ignore
+            data-lpignore="true"
             value={form.name}
             onChange={(e) => handleNameChange(e.target.value)}
             className="w-full border border-white/10 bg-transparent px-4 py-3 text-sm text-white outline-none focus:border-white/30"
@@ -154,6 +164,7 @@ export function DirectorForm({ director, mode }: DirectorFormProps) {
           <input
             type="text"
             required
+            autoComplete="off"
             value={form.slug}
             onChange={(e) => updateField("slug", slugify(e.target.value))}
             className="w-full border border-white/10 bg-transparent px-4 py-3 text-sm text-white outline-none focus:border-white/30"
@@ -168,9 +179,10 @@ export function DirectorForm({ director, mode }: DirectorFormProps) {
         <input
           type="number"
           min={0}
+          autoComplete="off"
           value={form.displayOrder}
           onChange={(e) => updateField("displayOrder", Number(e.target.value))}
-          className="w-full border border-white/10 bg-transparent px-4 py-3 text-sm text-white outline-none focus:border-white/30"
+          className="admin-number-input w-full border border-white/10 bg-transparent px-4 py-3 text-sm text-white outline-none focus:border-white/30"
         />
       </div>
 
@@ -194,6 +206,7 @@ export function DirectorForm({ director, mode }: DirectorFormProps) {
           <input
             type="file"
             accept="image/*"
+            autoComplete="off"
             className="hidden"
             onChange={handleImageUpload}
             disabled={uploading}
@@ -207,6 +220,7 @@ export function DirectorForm({ director, mode }: DirectorFormProps) {
         </label>
         <textarea
           rows={7}
+          autoComplete="off"
           value={form.description}
           onChange={(e) => updateField("description", e.target.value)}
           className="w-full resize-none border border-white/10 bg-transparent px-4 py-3 text-sm text-white outline-none focus:border-white/30"
@@ -237,13 +251,15 @@ export function DirectorForm({ director, mode }: DirectorFormProps) {
               <input
                 type="text"
                 placeholder="Label"
+                autoComplete="off"
                 value={link.label}
                 onChange={(e) => updateLink(index, "label", e.target.value)}
                 className="flex-1 border border-white/10 bg-transparent px-4 py-2 text-sm text-white outline-none focus:border-white/30"
               />
               <input
-                type="url"
+                type="text"
                 placeholder="https://instagram.com/..."
+                autoComplete="off"
                 value={link.url}
                 onChange={(e) => updateLink(index, "url", e.target.value)}
                 className="flex-[2] border border-white/10 bg-transparent px-4 py-2 text-sm text-white outline-none focus:border-white/30"
