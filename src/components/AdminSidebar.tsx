@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { signOut } from "firebase/auth";
 import { LayoutDashboard, Film, LogOut, Users, Settings } from "lucide-react";
 import { getFirebaseAuthAsync } from "@/lib/firebase/client";
@@ -15,13 +15,15 @@ const navItems = [
 
 export function AdminSidebar() {
   const pathname = usePathname();
-  const router = useRouter();
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
-    await signOut(await getFirebaseAuthAsync());
-    router.push("/admin/login");
-    router.refresh();
+    try {
+      await signOut(await getFirebaseAuthAsync());
+    } catch {
+      // Firebase client may not be initialized
+    }
+    window.location.assign("/admin/login");
   }
 
   return (

@@ -10,25 +10,8 @@ export type FirebaseClientConfig = {
   appId: string;
 };
 
-function getBuildTimeConfig(): FirebaseClientConfig | null {
-  const config: FirebaseClientConfig = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? "",
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ?? "",
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? "",
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ?? "",
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? "",
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID ?? "",
-  };
-
-  if (!config.apiKey || !config.authDomain || !config.projectId) {
-    return null;
-  }
-
-  return config;
-}
-
 async function fetchRuntimeConfig(): Promise<FirebaseClientConfig> {
-  const res = await fetch("/api/firebase-config");
+  const res = await fetch("/api/firebase-config", { cache: "no-store" });
 
   if (!res.ok) {
     const data = (await res.json().catch(() => null)) as { error?: string } | null;
@@ -50,9 +33,8 @@ async function fetchRuntimeConfig(): Promise<FirebaseClientConfig> {
 }
 
 let app: FirebaseApp | null = null;
-let initPromise: Promise<FirebaseApp> | null = null;
 
-async function ensureFirebaseApp(): Promise<FirebaseApp> {
+export function initFirebaseApp(config: FirebaseClientConfig): FirebaseApp {
   if (app) return app;
 
   if (getApps().length) {
@@ -60,22 +42,13 @@ async function ensureFirebaseApp(): Promise<FirebaseApp> {
     return app;
   }
 
-  if (!initPromise) {
-    initPromise = (async () => {
-      const config = getBuildTimeConfig() ?? (await fetchRuntimeConfig());
-      app = initializeApp(config);
-      return app;
-    })();
-  }
-
-  return initPromise;
+  app = initializeApp(config);
+  return app;
 }
 
-export async function getFirebaseAppAsync(): Promise<FirebaseApp> {
-  return ensureFirebaseApp();
-}
-
-export async function getFirebaseAuthAsync(): Promise<Auth> {
-  const firebaseApp = await ensureFirebaseApp();
-  return getAuth(firebaseApp);
+export async function getFirebaseAuthAsync(
+  config?: FirebaseClientConfig
+): Promise<Auth> {
+  const resolvedConfig = config ?? (await fetchRuntimeConfig());
+  return getAuth(initFirebaseApp(resolvedConfig));
 }
