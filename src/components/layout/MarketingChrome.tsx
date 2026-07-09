@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Bebas_Neue } from "next/font/google";
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
 import { VimeoIcon } from "@/components/icons/VimeoIcon";
-import { BRAND_NAME, COPYRIGHT_HOLDER } from "@/utils/constants";
+import { BRAND_NAME } from "@/utils/constants";
 import { extractVimeoId } from "@/utils/vimeo";
 
 const bebasNeue = Bebas_Neue({
@@ -38,7 +38,7 @@ export function MarketingChrome({
             {BRAND_NAME}
           </Link>
           <p className="mt-2 text-[10px] tracking-[0.12em] text-white/70 md:text-[11px]">
-            © {COPYRIGHT_HOLDER}
+            © {BRAND_NAME}. ALL RIGHTS RESERVED.
           </p>
         </div>
 
