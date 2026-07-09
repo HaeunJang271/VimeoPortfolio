@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { getFirebaseConfigFromEnv } from "@/lib/firebase/server-config";
+import {
+  getFirebaseConfigFromEnv,
+  getMissingFirebaseClientEnvKeys,
+} from "@/lib/firebase/server-config";
 import {
   getServiceAccount,
   validateServiceAccount,
@@ -15,6 +18,7 @@ export async function GET() {
 
   if (!clientConfig) {
     issues.push("NEXT_PUBLIC_FIREBASE_* 환경변수 6개 필요");
+    issues.push(...getMissingFirebaseClientEnvKeys().map((key) => `누락: ${key}`));
   }
 
   if (!serviceAccount) {
