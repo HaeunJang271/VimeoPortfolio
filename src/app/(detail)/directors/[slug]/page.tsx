@@ -5,13 +5,10 @@ import { DirectorWorkCard } from "@/components/DirectorWorkCard";
 import { FadeIn } from "@/components/FadeIn";
 import { getDirectorBySlug, getDirectors, getWorksByDirectorId } from "@/services/directors";
 
+export const dynamic = "force-dynamic";
+
 interface DirectorDetailPageProps {
   params: Promise<{ slug: string }>;
-}
-
-export async function generateStaticParams() {
-  const directors = await getDirectors();
-  return directors.map((director) => ({ slug: director.slug }));
 }
 
 export async function generateMetadata({

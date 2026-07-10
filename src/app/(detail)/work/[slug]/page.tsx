@@ -11,13 +11,10 @@ import {
   getWorks,
 } from "@/services/works";
 
+export const dynamic = "force-dynamic";
+
 interface WorkDetailPageProps {
   params: Promise<{ slug: string }>;
-}
-
-export async function generateStaticParams() {
-  const works = await getWorks();
-  return works.map((work) => ({ slug: work.slug }));
 }
 
 export async function generateMetadata({

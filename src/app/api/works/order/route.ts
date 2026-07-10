@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { requireAdminUser } from "@/lib/firebase/auth-server";
+import { revalidateAfterWorkChange } from "@/lib/revalidate";
 import { updateWorksDisplayOrder } from "@/services/works";
+
+export const dynamic = "force-dynamic";
 
 export async function PUT(request: Request) {
   try {
@@ -15,6 +18,7 @@ export async function PUT(request: Request) {
     }
 
     await updateWorksDisplayOrder(body.workIds);
+    await revalidateAfterWorkChange();
     return NextResponse.json({ success: true });
   } catch (error) {
     const message =

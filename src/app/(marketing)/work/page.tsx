@@ -3,6 +3,8 @@ import { FadeIn } from "@/components/FadeIn";
 import { ProjectCard } from "@/components/ProjectCard";
 import { getWorks } from "@/services/works";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Work",
 };

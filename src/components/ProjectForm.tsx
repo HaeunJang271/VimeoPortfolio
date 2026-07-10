@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Plus, Trash2, Upload } from "lucide-react";
 import { slugify } from "@/utils/slug";
 import { normalizeCredit, normalizeCredits } from "@/utils/credits";
+import { readJsonResponse } from "@/utils/http";
 import type { Director } from "@/types/director";
 import type { Credit, Work, WorkFormData } from "@/types/work";
 
@@ -133,7 +134,7 @@ export function ProjectForm({
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
+      const data = await readJsonResponse<Work & { error?: string }>(res);
       if (!res.ok) throw new Error(data.error ?? "Save failed");
 
       if (
