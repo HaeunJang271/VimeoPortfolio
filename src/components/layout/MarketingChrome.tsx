@@ -2,7 +2,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { Bebas_Neue } from "next/font/google";
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
-import { VimeoIcon } from "@/components/icons/VimeoIcon";
 import { BRAND_NAME } from "@/utils/constants";
 
 const bebasNeue = Bebas_Neue({
@@ -72,7 +71,13 @@ export function MarketingChrome({
             aria-label="Vimeo"
             className="text-white transition-opacity hover:opacity-60"
           >
-            <VimeoIcon className="h-5 w-5 md:h-6 md:w-6" />
+            <Image
+              src="/logo/vimeo.png"
+              alt="Vimeo"
+              width={24}
+              height={24}
+              className="h-5 w-5 object-contain md:h-6 md:w-6"
+            />
           </a>
         </div>
       </div>
