@@ -28,8 +28,8 @@ export function DirectorCard({ director, index = 0 }: DirectorCardProps) {
       >
         <div className="flex items-center justify-between gap-6">
           <div className="flex min-w-0 items-center gap-5 md:gap-8">
-            {director.profileImage ? (
-              <div className="relative h-16 w-14 shrink-0 overflow-hidden bg-white/5 md:h-20 md:w-16">
+            <div className="relative h-16 w-14 shrink-0 overflow-hidden bg-white/5 md:h-20 md:w-16">
+              {director.profileImage ? (
                 <Image
                   src={director.profileImage}
                   alt={director.name}
@@ -37,8 +37,8 @@ export function DirectorCard({ director, index = 0 }: DirectorCardProps) {
                   className="object-cover"
                   sizes="64px"
                 />
-              </div>
-            ) : null}
+              ) : null}
+            </div>
             <div className="min-w-0">
               <h3 className="text-xl font-medium tracking-[0.04em] text-white md:text-3xl">
                 {director.name}

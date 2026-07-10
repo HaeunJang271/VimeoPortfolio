@@ -38,8 +38,8 @@ export default async function DirectorDetailPage({
       <div className="mx-auto max-w-7xl px-6 pb-40 pt-8 md:px-10 md:pb-44 md:pt-12">
         <FadeIn>
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:gap-10">
-            {director.profileImage ? (
-              <div className="relative h-48 w-40 shrink-0 overflow-hidden bg-white/5 md:h-56 md:w-44">
+            <div className="relative h-48 w-40 shrink-0 overflow-hidden bg-white/5 md:h-56 md:w-44">
+              {director.profileImage ? (
                 <Image
                   src={director.profileImage}
                   alt={director.name}
@@ -48,8 +48,8 @@ export default async function DirectorDetailPage({
                   sizes="(max-width: 768px) 160px, 176px"
                   priority
                 />
-              </div>
-            ) : null}
+              ) : null}
+            </div>
             <h1 className="text-3xl font-medium uppercase tracking-[0.04em] text-white md:text-5xl">
               {director.name}
             </h1>
