@@ -1,3 +1,4 @@
+import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb, isFirebaseAdminConfigured } from "@/lib/firebase/admin";
 import {
   docToSiteSettings,
@@ -51,6 +52,8 @@ export async function updateSiteSettings(
     .collection(SETTINGS_COLLECTION)
     .doc(SETTINGS_DOC_ID);
 
+  const logo = formData.logo?.trim() ?? "";
+
   await docRef.set(
     {
       homepageShowreel: formData.homepageShowreel,
@@ -58,7 +61,7 @@ export async function updateSiteSettings(
       phone: formData.phone,
       instagram: formData.instagram,
       vimeoUrl: formData.vimeoUrl,
-      logo: formData.logo || null,
+      logo: logo ? logo : FieldValue.delete(),
     },
     { merge: true }
   );

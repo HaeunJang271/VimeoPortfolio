@@ -30,7 +30,7 @@ export function MarketingChrome({
             href="/"
             className="block transition-opacity hover:opacity-70"
           >
-            {logo ? (
+            {logo?.trim() ? (
               <div className="relative h-10 w-36 md:h-12 md:w-44">
                 <Image
                   src={logo}

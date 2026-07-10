@@ -4,6 +4,8 @@ import { MarketingChrome } from "@/components/layout/MarketingChrome";
 import { MarketingContent } from "@/components/layout/MarketingContent";
 import { getSiteSettings } from "@/services/settings";
 
+export const dynamic = "force-dynamic";
+
 export default async function MarketingLayout({
   children,
 }: {

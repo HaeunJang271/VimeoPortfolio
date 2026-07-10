@@ -72,6 +72,6 @@ export function docToSiteSettings(
     phone: data?.phone ?? "+1 (000) 000-0000",
     instagram: data?.instagram ?? "https://instagram.com/studio",
     vimeoUrl: data?.vimeoUrl ?? getDefaultVimeoUrl(homepageShowreel),
-    logo: data?.logo ?? null,
+    logo: data?.logo?.trim() ? data.logo : null,
   };
 }

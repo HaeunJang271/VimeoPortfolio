@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Upload, X } from "lucide-react";
@@ -23,6 +23,19 @@ export function SiteSettingsForm({ settings }: SiteSettingsFormProps) {
     vimeoUrl: settings.vimeoUrl,
     logo: settings.logo ?? "",
   });
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [removingLogo, setRemovingLogo] = useState(false);
+
+  useEffect(() => {
+    setForm({
+      homepageShowreel: settings.homepageShowreel,
+      contactEmail: settings.contactEmail,
+      phone: settings.phone,
+      instagram: settings.instagram,
+      vimeoUrl: settings.vimeoUrl,
+      logo: settings.logo ?? "",
+    });
+  }, [settings]);
 
   function updateField<K extends keyof SiteSettingsFormData>(
     key: K,
@@ -52,6 +65,36 @@ export function SiteSettingsForm({ settings }: SiteSettingsFormProps) {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function handleRemoveLogo() {
+    const previousLogo = form.logo;
+    const nextForm = { ...form, logo: "" };
+    setForm(nextForm);
+    setRemovingLogo(true);
+    setError(null);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
+    try {
+      const res = await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(nextForm),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Failed to remove logo");
+
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to remove logo");
+      setForm((prev) => ({ ...prev, logo: previousLogo }));
+    } finally {
+      setRemovingLogo(false);
     }
   }
 
@@ -178,9 +221,10 @@ export function SiteSettingsForm({ settings }: SiteSettingsFormProps) {
             />
             <button
               type="button"
-              onClick={() => updateField("logo", "")}
+              onClick={handleRemoveLogo}
+              disabled={removingLogo}
               aria-label="Remove logo"
-              className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-white/80 transition-colors hover:bg-black hover:text-white"
+              className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-white/80 transition-colors hover:bg-black hover:text-white disabled:opacity-50"
             >
               <X size={14} />
             </button>
@@ -190,6 +234,7 @@ export function SiteSettingsForm({ settings }: SiteSettingsFormProps) {
           <Upload size={16} />
           {uploading ? "Uploading..." : "Upload Logo"}
           <input
+            ref={fileInputRef}
             type="file"
             accept="image/*"
             autoComplete="off"

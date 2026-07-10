@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { requireAdminUser } from "@/lib/firebase/auth-server";
 import { getSiteSettings, updateSiteSettings } from "@/services/settings";
 import type { SiteSettingsFormData } from "@/types/settings";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   const settings = await getSiteSettings();
@@ -13,6 +16,8 @@ export async function PUT(request: Request) {
     await requireAdminUser();
     const body = (await request.json()) as SiteSettingsFormData;
     const settings = await updateSiteSettings(body);
+    revalidatePath("/", "layout");
+    revalidatePath("/admin/settings");
     return NextResponse.json(settings);
   } catch (error) {
     const message =
