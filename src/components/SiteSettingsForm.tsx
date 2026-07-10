@@ -218,8 +218,11 @@ export function SiteSettingsForm({ settings }: SiteSettingsFormProps) {
         </p>
         {form.logo && (
           <div
-            className="relative w-48 overflow-hidden bg-white/5 p-4"
-            style={{ height: `${form.logoHeight}px` }}
+            className="relative max-w-[85vw] overflow-hidden bg-white/5 p-4"
+            style={{
+              height: `${form.logoHeight}px`,
+              width: `${Math.round(form.logoHeight * (176 / 48))}px`,
+            }}
           >
             <Image
               src={form.logo}
@@ -260,7 +263,7 @@ export function SiteSettingsForm({ settings }: SiteSettingsFormProps) {
         <input
           type="number"
           min={24}
-          max={120}
+          max={200}
           autoComplete="off"
           value={form.logoHeight}
           onChange={(e) =>

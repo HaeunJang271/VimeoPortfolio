@@ -56,7 +56,7 @@ export async function updateSiteSettings(
     .doc(SETTINGS_DOC_ID);
 
   const logo = formData.logo?.trim() ?? "";
-  const logoHeight = Math.min(120, Math.max(24, formData.logoHeight || 48));
+  const logoHeight = Math.min(200, Math.max(24, formData.logoHeight || 48));
   const copyrightText =
     formData.copyrightText?.trim() || getDefaultCopyrightText();
 

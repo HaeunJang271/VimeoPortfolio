@@ -10,6 +10,12 @@ const bebasNeue = Bebas_Neue({
   display: "swap",
 });
 
+const LOGO_WIDTH_RATIO = 176 / 48;
+
+function getLogoDisplayWidth(logoHeight: number): number {
+  return Math.round(logoHeight * LOGO_WIDTH_RATIO);
+}
+
 interface MarketingChromeProps {
   instagram: string;
   vimeoUrl: string;
@@ -28,6 +34,8 @@ export function MarketingChrome({
   const resolvedCopyright =
     copyrightText?.trim() ||
     `© ${new Date().getFullYear()} ${BRAND_NAME}. ALL RIGHTS RESERVED.`;
+  const logoWidth = getLogoDisplayWidth(logoHeight);
+
   return (
     <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-40">
       <div className="flex w-full items-end justify-between px-6 pb-8 md:px-10 md:pb-10">
@@ -38,15 +46,15 @@ export function MarketingChrome({
           >
             {logo?.trim() ? (
               <div
-                className="relative w-44 max-w-[70vw]"
-                style={{ height: `${logoHeight}px` }}
+                className="relative max-w-[85vw]"
+                style={{ height: `${logoHeight}px`, width: `${logoWidth}px` }}
               >
                 <Image
                   src={logo}
                   alt={BRAND_NAME}
                   fill
                   className="object-contain object-left"
-                  sizes="176px"
+                  sizes={`${logoWidth}px`}
                 />
               </div>
             ) : (

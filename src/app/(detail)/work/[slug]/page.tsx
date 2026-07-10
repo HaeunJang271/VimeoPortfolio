@@ -4,10 +4,9 @@ import { CreditList } from "@/components/CreditList";
 import { FadeIn } from "@/components/FadeIn";
 import { RelatedWorks } from "@/components/RelatedWorks";
 import { VideoPlayer } from "@/components/VideoPlayer";
-import { getDirectors } from "@/services/directors";
 import {
-  getRelatedWorksByDirector,
   getPublicWorks,
+  getRelatedPublicWorks,
   getWorkBySlug,
 } from "@/services/works";
 import { decodeRouteParam } from "@/utils/paths";
@@ -32,16 +31,8 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
 
   if (!work) notFound();
 
-  const [works, directors] = await Promise.all([getPublicWorks(), getDirectors()]);
-  const directorWorkOrders = Object.fromEntries(
-    directors.map((director) => [director.id, director.workOrder])
-  );
-  const relatedWorks = getRelatedWorksByDirector(
-    works,
-    work,
-    directorWorkOrders,
-    8
-  );
+  const works = await getPublicWorks();
+  const relatedWorks = getRelatedPublicWorks(works, work, 8);
 
   return (
     <main className="min-h-screen bg-black">

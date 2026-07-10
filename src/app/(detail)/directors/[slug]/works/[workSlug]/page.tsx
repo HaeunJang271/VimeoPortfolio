@@ -4,8 +4,14 @@ import { CreditList } from "@/components/CreditList";
 import { FadeIn } from "@/components/FadeIn";
 import { RelatedWorks } from "@/components/RelatedWorks";
 import { VideoPlayer } from "@/components/VideoPlayer";
-import { getDirectorBySlug, getDirectors } from "@/services/directors";
-import { getPublicWorks, getRelatedWorksByDirector, getWorkBySlug } from "@/services/works";
+import {
+  getDirectorBySlug,
+  getWorksByDirectorId,
+} from "@/services/directors";
+import {
+  getRelatedDirectorWorks,
+  getWorkBySlug,
+} from "@/services/works";
 import { decodeRouteParam } from "@/utils/paths";
 
 export const dynamic = "force-dynamic";
@@ -33,14 +39,15 @@ export default async function DirectorWorkDetailPage({
     notFound();
   }
 
-  const [works, directors] = await Promise.all([getPublicWorks(), getDirectors()]);
-  const directorWorkOrders = Object.fromEntries(
-    directors.map((item) => [item.id, item.workOrder])
+  const directorWorks = await getWorksByDirectorId(
+    director.id,
+    director.workOrder
   );
-  const relatedWorks = getRelatedWorksByDirector(
-    works,
+  const relatedWorks = getRelatedDirectorWorks(
+    directorWorks,
     work,
-    directorWorkOrders,
+    director.id,
+    director.workOrder,
     8
   );
 
@@ -77,7 +84,10 @@ export default async function DirectorWorkDetailPage({
         </FadeIn>
 
         <FadeIn delay={0.15}>
-          <RelatedWorks works={relatedWorks} />
+          <RelatedWorks
+            works={relatedWorks}
+            directorSlug={director.slug}
+          />
         </FadeIn>
       </div>
     </main>

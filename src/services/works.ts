@@ -155,6 +155,29 @@ export function getAdjacentWorks(
   };
 }
 
+export function getRelatedPublicWorks(
+  works: Work[],
+  currentWork: Work,
+  limit = 8
+): Work[] {
+  return works.filter((work) => work.id !== currentWork.id).slice(0, limit);
+}
+
+export function getRelatedDirectorWorks(
+  works: Work[],
+  currentWork: Work,
+  directorId: string,
+  workOrder: string[] = [],
+  limit = 8
+): Work[] {
+  const related = works.filter(
+    (work) =>
+      work.id !== currentWork.id && work.directorIds.includes(directorId)
+  );
+
+  return sortWorksByOrder(related, workOrder).slice(0, limit);
+}
+
 export function getRelatedWorksByDirector(
   works: Work[],
   currentWork: Work,
