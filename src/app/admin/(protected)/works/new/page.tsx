@@ -26,6 +26,7 @@ export default async function NewWorkPage({ searchParams }: NewWorkPageProps) {
             mode="create"
             directors={directors}
             initialDirectorIds={directorId ? [directorId] : []}
+            defaultShowOnWorkPage={!directorId}
             returnTo={returnTo}
           />
         </div>

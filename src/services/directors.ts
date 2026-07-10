@@ -63,9 +63,26 @@ export async function getDirectorById(id: string): Promise<Director | null> {
   }
 }
 
+async function getNextDirectorDisplayOrder(): Promise<number> {
+  const snapshot = await getAdminDb()
+    .collection(DIRECTORS_COLLECTION)
+    .orderBy("displayOrder", "desc")
+    .limit(1)
+    .get();
+
+  if (snapshot.empty) return 0;
+
+  return (snapshot.docs[0].data().displayOrder ?? 0) + 1;
+}
+
 export async function createDirector(
   formData: DirectorFormData
 ): Promise<Director> {
+  const displayOrder =
+    formData.displayOrder > 0
+      ? formData.displayOrder
+      : await getNextDirectorDisplayOrder();
+
   const docRef = await getAdminDb()
     .collection(DIRECTORS_COLLECTION)
     .add({
@@ -75,7 +92,7 @@ export async function createDirector(
       description: formData.description,
       descriptionLinks: formData.descriptionLinks,
       workOrder: formData.workOrder ?? [],
-      displayOrder: formData.displayOrder,
+      displayOrder,
       createdAt: FieldValue.serverTimestamp(),
     });
 

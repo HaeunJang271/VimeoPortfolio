@@ -20,7 +20,8 @@ export default async function AdminWorksPage() {
           <div>
             <h1 className="text-2xl font-medium text-white">Works</h1>
             <p className="mt-2 text-sm text-white/40">
-              {works.length} project{works.length !== 1 ? "s" : ""}
+              {works.length} project{works.length !== 1 ? "s" : ""} · 순서는
+              아래에서 드래그로 변경
             </p>
           </div>
           <Link

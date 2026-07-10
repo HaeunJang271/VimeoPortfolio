@@ -172,19 +172,9 @@ export function DirectorForm({ director, mode }: DirectorFormProps) {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <label className="text-xs tracking-[0.15em] text-white/40">
-          DISPLAY ORDER
-        </label>
-        <input
-          type="number"
-          min={0}
-          autoComplete="off"
-          value={form.displayOrder}
-          onChange={(e) => updateField("displayOrder", Number(e.target.value))}
-          className="admin-number-input w-full border border-white/10 bg-transparent px-4 py-3 text-sm text-white outline-none focus:border-white/30"
-        />
-      </div>
+      <p className="text-xs text-white/35">
+        DIRECTORS 목록 순서는 Directors 페이지에서 드래그로 변경합니다.
+      </p>
 
       <div className="space-y-2">
         <label className="text-xs tracking-[0.15em] text-white/40">

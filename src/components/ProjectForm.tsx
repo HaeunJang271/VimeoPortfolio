@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2, Upload } from "lucide-react";
 import { slugify } from "@/utils/slug";
-import { normalizeCredit, normalizeCredits } from "@/utils/credits";
+import { normalizeCredits } from "@/utils/credits";
 import { readJsonResponse } from "@/utils/http";
 import type { Director } from "@/types/director";
 import type { Credit, Work, WorkFormData } from "@/types/work";
@@ -16,6 +16,7 @@ interface ProjectFormProps {
   mode: "create" | "edit";
   initialDirectorIds?: string[];
   returnTo?: string;
+  defaultShowOnWorkPage?: boolean;
 }
 
 const emptyCredit: Credit = { role: "", name: "" };
@@ -26,6 +27,7 @@ export function ProjectForm({
   mode,
   initialDirectorIds = [],
   returnTo,
+  defaultShowOnWorkPage = true,
 }: ProjectFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -38,13 +40,12 @@ export function ProjectForm({
     thumbnail: work?.thumbnail ?? "",
     vimeoUrl: work?.vimeoUrl ?? "",
     description: work?.description ?? "",
-    credits: work?.credits?.length
-      ? work.credits.map((credit) => normalizeCredit(credit))
-      : [{ ...emptyCredit }],
+    credits: work?.credits?.length ? [...work.credits] : [{ ...emptyCredit }],
     displayOrder: work?.displayOrder ?? 0,
     directorIds:
       work?.directorIds ??
       (initialDirectorIds.length > 0 ? initialDirectorIds : []),
+    showOnWorkPage: work?.showOnWorkPage ?? defaultShowOnWorkPage,
   });
 
   function updateField<K extends keyof WorkFormData>(
@@ -63,7 +64,7 @@ export function ProjectForm({
 
   function updateCredit(index: number, field: keyof Credit, value: string) {
     const credits = [...form.credits];
-    credits[index] = normalizeCredit({ ...credits[index], [field]: value });
+    credits[index] = { ...credits[index], [field]: value };
     updateField("credits", credits);
   }
 
@@ -221,26 +222,30 @@ export function ProjectForm({
           type="text"
           required
           autoComplete="off"
-          placeholder="https://vimeo.com/123456789"
+          placeholder="https://vimeo.com/123456789 또는 share 링크"
           value={form.vimeoUrl}
           onChange={(e) => updateField("vimeoUrl", e.target.value)}
           className="w-full border border-white/10 bg-transparent px-4 py-3 text-sm text-white outline-none transition-colors focus:border-white/30"
         />
+        <p className="text-xs text-white/35">
+          숫자 ID URL, player URL, vimeo.com/share 링크 모두 사용 가능합니다.
+        </p>
       </div>
 
-      <div className="space-y-2">
-        <label className="text-xs tracking-[0.15em] text-white/40">
-          DISPLAY ORDER
-        </label>
+      <label className="flex cursor-pointer items-start gap-3 border border-white/10 px-4 py-4 text-sm text-white/75">
         <input
-          type="number"
-          min={0}
-          autoComplete="off"
-          value={form.displayOrder}
-          onChange={(e) => updateField("displayOrder", Number(e.target.value))}
-          className="admin-number-input w-full border border-white/10 bg-transparent px-4 py-3 text-sm text-white outline-none transition-colors focus:border-white/30"
+          type="checkbox"
+          checked={form.showOnWorkPage}
+          onChange={(e) => updateField("showOnWorkPage", e.target.checked)}
+          className="mt-0.5 h-4 w-4 accent-white"
         />
-      </div>
+        <span>
+          <span className="block text-white">WORK 페이지에 표시</span>
+          <span className="mt-1 block text-xs text-white/40">
+            체크 해제 시 감독 페이지에만 표시됩니다.
+          </span>
+        </span>
+      </label>
 
       <div className="space-y-2">
         <label className="text-xs tracking-[0.15em] text-white/40">
@@ -313,6 +318,9 @@ export function ProjectForm({
           onChange={(e) => updateField("description", e.target.value)}
           className="w-full resize-none border border-white/10 bg-transparent px-4 py-3 text-sm text-white outline-none transition-colors focus:border-white/30"
         />
+        <p className="text-xs text-white/35">
+          작품 상세 페이지 영상 아래에 표시됩니다.
+        </p>
       </div>
 
       <div className="space-y-4">

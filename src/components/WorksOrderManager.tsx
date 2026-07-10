@@ -73,6 +73,11 @@ function SortableWorkRow({ work, directorNamesById }: SortableWorkRowProps) {
             .filter(Boolean)
             .join(", ") || "—"}
         </p>
+        {!work.showOnWorkPage ? (
+          <p className="mt-1 text-[10px] tracking-[0.12em] text-amber-200/70">
+            DIRECTOR ONLY
+          </p>
+        ) : null}
       </div>
 
       <div className="flex shrink-0 items-center gap-1">

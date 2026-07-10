@@ -16,7 +16,7 @@ export function CreditList({ credits }: CreditListProps) {
         {normalized.map((credit, index) => (
           <p
             key={`${credit.role}-${credit.name}-${index}`}
-            className="text-sm leading-relaxed text-white/75 md:text-[15px]"
+            className="text-sm leading-relaxed whitespace-pre-wrap text-white/75 md:text-[15px]"
           >
             {formatCreditLine(credit)}
           </p>

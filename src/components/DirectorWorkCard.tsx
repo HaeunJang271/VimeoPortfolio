@@ -60,7 +60,7 @@ export function DirectorWorkCard({ work, index = 0 }: DirectorWorkCardProps) {
             {work.credits.map((credit, creditIndex) => (
               <p
                 key={`${credit.role}-${credit.name}-${creditIndex}`}
-                className="text-xs leading-relaxed text-white/50 md:text-[13px]"
+                className="text-xs leading-relaxed whitespace-pre-wrap text-white/50 md:text-[13px]"
               >
                 {formatCreditLine(credit)}
               </p>

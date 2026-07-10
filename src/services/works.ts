@@ -1,8 +1,44 @@
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb, isFirebaseAdminConfigured } from "@/lib/firebase/admin";
 import { docToWork, WORKS_COLLECTION } from "@/lib/firebase/firestore";
+import { resolveVimeoVideoId } from "@/lib/vimeo/resolve";
 import type { Work, WorkFormData } from "@/types/work";
 import { sortWorksByOrder } from "@/utils/work-order";
+
+async function prepareWorkPayload(formData: WorkFormData) {
+  const vimeoVideoId = await resolveVimeoVideoId(formData.vimeoUrl);
+
+  if (!vimeoVideoId) {
+    throw new Error(
+      "Vimeo URL을 인식하지 못했습니다. 숫자 ID URL 또는 vimeo.com/share 링크를 사용하세요."
+    );
+  }
+
+  return {
+    title: formData.title,
+    slug: formData.slug,
+    thumbnail: formData.thumbnail || null,
+    vimeoUrl: formData.vimeoUrl.trim(),
+    vimeoVideoId,
+    description: formData.description,
+    credits: formData.credits,
+    displayOrder: formData.displayOrder,
+    directorIds: formData.directorIds,
+    showOnWorkPage: formData.showOnWorkPage,
+  };
+}
+
+async function getNextDisplayOrder(): Promise<number> {
+  const snapshot = await getAdminDb()
+    .collection(WORKS_COLLECTION)
+    .orderBy("displayOrder", "desc")
+    .limit(1)
+    .get();
+
+  if (snapshot.empty) return 0;
+
+  return (snapshot.docs[0].data().displayOrder ?? 0) + 1;
+}
 
 export async function getWorks(): Promise<Work[]> {
   if (!isFirebaseAdminConfigured()) return [];
@@ -18,6 +54,11 @@ export async function getWorks(): Promise<Work[]> {
     console.error("Failed to fetch works:", error);
     return [];
   }
+}
+
+export async function getPublicWorks(): Promise<Work[]> {
+  const works = await getWorks();
+  return works.filter((work) => work.showOnWorkPage);
 }
 
 export async function getWorkBySlug(slug: string): Promise<Work | null> {
@@ -56,17 +97,15 @@ export async function getWorkById(id: string): Promise<Work | null> {
 }
 
 export async function createWork(formData: WorkFormData): Promise<Work> {
+  const payload = await prepareWorkPayload(formData);
+  const displayOrder =
+    formData.displayOrder > 0 ? formData.displayOrder : await getNextDisplayOrder();
+
   const docRef = await getAdminDb()
     .collection(WORKS_COLLECTION)
     .add({
-      title: formData.title,
-      slug: formData.slug,
-      thumbnail: formData.thumbnail || null,
-      vimeoUrl: formData.vimeoUrl,
-      description: formData.description,
-      credits: formData.credits,
-      displayOrder: formData.displayOrder,
-      directorIds: formData.directorIds,
+      ...payload,
+      displayOrder,
       createdAt: FieldValue.serverTimestamp(),
     });
 
@@ -79,17 +118,9 @@ export async function updateWork(
   formData: WorkFormData
 ): Promise<Work> {
   const docRef = getAdminDb().collection(WORKS_COLLECTION).doc(id);
+  const payload = await prepareWorkPayload(formData);
 
-  await docRef.update({
-    title: formData.title,
-    slug: formData.slug,
-    thumbnail: formData.thumbnail || null,
-    vimeoUrl: formData.vimeoUrl,
-    description: formData.description,
-    credits: formData.credits,
-    displayOrder: formData.displayOrder,
-    directorIds: formData.directorIds,
-  });
+  await docRef.update(payload);
 
   const doc = await docRef.get();
   return docToWork(doc.id, doc.data()!);
@@ -136,6 +167,7 @@ export function getRelatedWorksByDirector(
 
   const related = works.filter(
     (work) =>
+      work.showOnWorkPage &&
       work.id !== currentWork.id &&
       work.directorIds.some((directorId) =>
         sharedDirectorIds.includes(directorId)

@@ -7,8 +7,8 @@ import { VideoPlayer } from "@/components/VideoPlayer";
 import { getDirectors } from "@/services/directors";
 import {
   getRelatedWorksByDirector,
+  getPublicWorks,
   getWorkBySlug,
-  getWorks,
 } from "@/services/works";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +31,7 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
 
   if (!work) notFound();
 
-  const [works, directors] = await Promise.all([getWorks(), getDirectors()]);
+  const [works, directors] = await Promise.all([getPublicWorks(), getDirectors()]);
   const directorWorkOrders = Object.fromEntries(
     directors.map((director) => [director.id, director.workOrder])
   );
@@ -53,9 +53,21 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
 
         <FadeIn delay={0.05}>
           <div className="mt-8 md:mt-10">
-            <VideoPlayer vimeoUrl={work.vimeoUrl} title={work.title} />
+            <VideoPlayer
+              vimeoUrl={work.vimeoUrl}
+              vimeoVideoId={work.vimeoVideoId}
+              title={work.title}
+            />
           </div>
         </FadeIn>
+
+        {work.description ? (
+          <FadeIn delay={0.08}>
+            <p className="mt-8 max-w-3xl whitespace-pre-wrap text-sm leading-relaxed text-white/70 md:mt-10 md:text-[15px]">
+              {work.description}
+            </p>
+          </FadeIn>
+        ) : null}
 
         <FadeIn delay={0.1}>
           <CreditList credits={work.credits} />

@@ -141,6 +141,7 @@ export function DirectorWorksManager({
           <h2 className="text-lg font-medium text-white">Portfolio Works</h2>
           <p className="mt-2 text-sm text-white/40">
             Manage and reorder works shown on {directorName}&apos;s page.
+            Director-only works do not appear on the WORK page.
           </p>
         </div>
         <Link

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { FadeIn } from "@/components/FadeIn";
 import { ProjectCard } from "@/components/ProjectCard";
-import { getWorks } from "@/services/works";
+import { getPublicWorks } from "@/services/works";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function WorkPage() {
-  const works = await getWorks();
+  const works = await getPublicWorks();
 
   return (
     <main className="min-h-dvh">

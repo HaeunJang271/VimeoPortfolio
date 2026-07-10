@@ -32,10 +32,12 @@ export function docToWork(
     slug: data.slug ?? "",
     thumbnail: data.thumbnail ?? null,
     vimeoUrl: data.vimeoUrl ?? "",
+    vimeoVideoId: data.vimeoVideoId ?? null,
     description: data.description ?? "",
     credits: normalizeCredits(data.credits),
     displayOrder: data.displayOrder ?? 0,
     directorIds: data.directorIds ?? [],
+    showOnWorkPage: data.showOnWorkPage !== false,
     createdAt: timestampToIso(createdAt),
   };
 }
