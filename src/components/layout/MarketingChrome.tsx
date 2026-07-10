@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Bebas_Neue } from "next/font/google";
 import { InstagramIcon } from "@/components/icons/InstagramIcon";
 import { BRAND_NAME } from "@/utils/constants";
+import { splitCopyrightForMobile } from "@/utils/copyright";
 
 const bebasNeue = Bebas_Neue({
   weight: "400",
@@ -35,6 +36,7 @@ export function MarketingChrome({
   const resolvedCopyright =
     copyrightText?.trim() ||
     `© ${new Date().getFullYear()} ${BRAND_NAME}. ALL RIGHTS RESERVED.`;
+  const mobileCopyright = splitCopyrightForMobile(resolvedCopyright);
   const desktopLogoWidth = getLogoDisplayWidth(logoHeight);
   const mobileLogoWidth = getLogoDisplayWidth(MOBILE_LOGO_MAX_HEIGHT);
 
@@ -89,9 +91,13 @@ export function MarketingChrome({
               </span>
             )}
           </Link>
-          <p className="mt-2 max-w-full truncate text-[10px] tracking-[0.12em] text-white/70 md:text-[11px]">
-            {resolvedCopyright}
-          </p>
+          <div className="mt-2 text-[10px] tracking-[0.12em] text-white/70 md:text-[11px]">
+            <div className="md:hidden">
+              <p>{mobileCopyright.line1}</p>
+              {mobileCopyright.line2 ? <p>{mobileCopyright.line2}</p> : null}
+            </div>
+            <p className="hidden max-w-full md:block">{resolvedCopyright}</p>
+          </div>
         </div>
 
         <div className="pointer-events-auto flex shrink-0 items-center gap-3 rounded-full bg-black/70 px-3 py-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.45)] backdrop-blur-sm md:gap-5 md:bg-black/55 md:px-3.5 md:py-2">
