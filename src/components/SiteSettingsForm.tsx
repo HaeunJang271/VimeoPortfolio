@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Upload } from "lucide-react";
+import { Upload, X } from "lucide-react";
 import type { SiteSettings, SiteSettingsFormData } from "@/types/settings";
 
 interface SiteSettingsFormProps {
@@ -176,6 +176,14 @@ export function SiteSettingsForm({ settings }: SiteSettingsFormProps) {
               fill
               className="object-contain p-4"
             />
+            <button
+              type="button"
+              onClick={() => updateField("logo", "")}
+              aria-label="Remove logo"
+              className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-white/80 transition-colors hover:bg-black hover:text-white"
+            >
+              <X size={14} />
+            </button>
           </div>
         )}
         <label className="flex w-full cursor-pointer items-center gap-2 border border-white/10 px-4 py-3 text-sm text-white/70 transition-colors hover:border-white/30 hover:text-white">
