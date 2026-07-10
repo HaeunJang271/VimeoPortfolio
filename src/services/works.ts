@@ -177,28 +177,3 @@ export function getRelatedDirectorWorks(
 
   return sortWorksByOrder(related, workOrder).slice(0, limit);
 }
-
-export function getRelatedWorksByDirector(
-  works: Work[],
-  currentWork: Work,
-  directorWorkOrders: Record<string, string[]> = {},
-  limit = 6
-): Work[] {
-  const sharedDirectorIds = currentWork.directorIds;
-
-  if (sharedDirectorIds.length === 0) return [];
-
-  const related = works.filter(
-    (work) =>
-      work.showOnWorkPage &&
-      work.id !== currentWork.id &&
-      work.directorIds.some((directorId) =>
-        sharedDirectorIds.includes(directorId)
-      )
-  );
-
-  const primaryDirectorId = sharedDirectorIds[0];
-  const workOrder = directorWorkOrders[primaryDirectorId] ?? [];
-
-  return sortWorksByOrder(related, workOrder).slice(0, limit);
-}

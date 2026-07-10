@@ -19,10 +19,10 @@ export function directorWorkPath(directorSlug: string, workSlug: string): string
 }
 
 export function getWorkHref(
-  work: { slug: string; showOnWorkPage: boolean },
+  work: { slug: string },
   directorSlug?: string
 ): string {
-  if (!work.showOnWorkPage && directorSlug) {
+  if (directorSlug) {
     return directorWorkPath(directorSlug, work.slug);
   }
 

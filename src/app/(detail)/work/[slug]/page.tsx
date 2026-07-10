@@ -31,6 +31,8 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
 
   if (!work) notFound();
 
+  if (!work.showOnWorkPage) notFound();
+
   const works = await getPublicWorks();
   const relatedWorks = getRelatedPublicWorks(works, work, 8);
 
