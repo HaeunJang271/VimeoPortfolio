@@ -3,6 +3,12 @@ import { BRAND_NAME, SITE_NAME } from "@/utils/constants";
 import type { SiteSettings } from "@/types/settings";
 
 const DEFAULT_DESCRIPTION = "Video production studio portfolio";
+const OG_IMAGE = {
+  url: "/logo/thumbnail.png",
+  width: 2048,
+  height: 1536,
+  alt: SITE_NAME,
+};
 
 export function getSiteUrl(): string {
   if (process.env.NEXT_PUBLIC_SITE_URL?.trim()) {
@@ -19,14 +25,7 @@ export function getSiteUrl(): string {
 export function buildSiteMetadata(settings?: Pick<SiteSettings, "logo">): Metadata {
   const siteUrl = getSiteUrl();
   const logo = settings?.logo?.trim();
-  const ogImage = [
-    {
-      url: "/opengraph-image",
-      width: 1200,
-      height: 630,
-      alt: SITE_NAME,
-    },
-  ];
+  const ogImage = [OG_IMAGE];
 
   return {
     metadataBase: new URL(siteUrl),
