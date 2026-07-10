@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { directorPath } from "@/utils/paths";
 import { motion } from "framer-motion";
 import type { Director } from "@/types/director";
 
@@ -23,7 +24,7 @@ export function DirectorCard({ director, index = 0 }: DirectorCardProps) {
       }}
     >
       <Link
-        href={`/directors/${director.slug}`}
+        href={directorPath(director.slug)}
         className="group block border-b border-white/10 py-8 transition-colors hover:border-white/30 md:py-10"
       >
         <div className="flex items-center justify-between gap-6">
@@ -43,11 +44,6 @@ export function DirectorCard({ director, index = 0 }: DirectorCardProps) {
               <h3 className="text-xl font-medium tracking-[0.04em] text-white md:text-3xl">
                 {director.name}
               </h3>
-              {director.description && (
-                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/50 md:text-base">
-                  {director.description}
-                </p>
-              )}
             </div>
           </div>
           <span className="shrink-0 text-xs tracking-[0.2em] text-white/35 transition-transform duration-500 group-hover:translate-x-1">

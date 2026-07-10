@@ -4,37 +4,38 @@ import { CreditList } from "@/components/CreditList";
 import { FadeIn } from "@/components/FadeIn";
 import { RelatedWorks } from "@/components/RelatedWorks";
 import { VideoPlayer } from "@/components/VideoPlayer";
-import { getDirectors } from "@/services/directors";
-import {
-  getRelatedWorksByDirector,
-  getPublicWorks,
-  getWorkBySlug,
-} from "@/services/works";
+import { getDirectorBySlug, getDirectors } from "@/services/directors";
+import { getPublicWorks, getRelatedWorksByDirector, getWorkBySlug } from "@/services/works";
 import { decodeRouteParam } from "@/utils/paths";
 
 export const dynamic = "force-dynamic";
 
-interface WorkDetailPageProps {
-  params: Promise<{ slug: string }>;
+interface DirectorWorkDetailPageProps {
+  params: Promise<{ slug: string; workSlug: string }>;
 }
 
 export async function generateMetadata({
   params,
-}: WorkDetailPageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const work = await getWorkBySlug(decodeRouteParam(slug));
+}: DirectorWorkDetailPageProps): Promise<Metadata> {
+  const { workSlug } = await params;
+  const work = await getWorkBySlug(decodeRouteParam(workSlug));
   return { title: work?.title ?? "Project" };
 }
 
-export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
-  const { slug } = await params;
-  const work = await getWorkBySlug(decodeRouteParam(slug));
+export default async function DirectorWorkDetailPage({
+  params,
+}: DirectorWorkDetailPageProps) {
+  const { slug, workSlug } = await params;
+  const director = await getDirectorBySlug(decodeRouteParam(slug));
+  const work = await getWorkBySlug(decodeRouteParam(workSlug));
 
-  if (!work) notFound();
+  if (!director || !work || !work.directorIds.includes(director.id)) {
+    notFound();
+  }
 
   const [works, directors] = await Promise.all([getPublicWorks(), getDirectors()]);
   const directorWorkOrders = Object.fromEntries(
-    directors.map((director) => [director.id, director.workOrder])
+    directors.map((item) => [item.id, item.workOrder])
   );
   const relatedWorks = getRelatedWorksByDirector(
     works,
@@ -47,7 +48,8 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
     <main className="min-h-screen bg-black">
       <div className="mx-auto max-w-6xl px-6 pb-40 pt-8 md:px-10 md:pb-44 md:pt-12">
         <FadeIn>
-          <h1 className="max-w-4xl text-2xl font-medium leading-snug tracking-[0.02em] text-white md:text-4xl">
+          <p className="text-xs tracking-[0.2em] text-white/40">{director.name}</p>
+          <h1 className="mt-3 max-w-4xl text-2xl font-medium leading-snug tracking-[0.02em] text-white md:text-4xl">
             {work.title}
           </h1>
         </FadeIn>

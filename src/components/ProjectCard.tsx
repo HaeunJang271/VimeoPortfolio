@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { workPath } from "@/utils/paths";
 import { motion } from "framer-motion";
 import type { Work } from "@/types/work";
 
@@ -22,7 +23,7 @@ export function ProjectCard({ work, index = 0 }: ProjectCardProps) {
         ease: [0.22, 1, 0.36, 1],
       }}
     >
-      <Link href={`/work/${work.slug}`} className="group block">
+      <Link href={workPath(work.slug)} className="group block">
         <div className="relative aspect-[16/10] overflow-hidden bg-white/5">
           {work.thumbnail ? (
             <Image

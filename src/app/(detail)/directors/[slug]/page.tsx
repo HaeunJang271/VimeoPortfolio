@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import { DirectorDescription } from "@/components/DirectorDescription";
 import { DirectorWorkCard } from "@/components/DirectorWorkCard";
 import { FadeIn } from "@/components/FadeIn";
-import { getDirectorBySlug, getDirectors, getWorksByDirectorId } from "@/services/directors";
+import { getDirectorBySlug, getWorksByDirectorId } from "@/services/directors";
+import { decodeRouteParam } from "@/utils/paths";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,7 @@ export async function generateMetadata({
   params,
 }: DirectorDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const director = await getDirectorBySlug(slug);
+  const director = await getDirectorBySlug(decodeRouteParam(slug));
 
   return {
     title: director?.name ?? "Director",
@@ -27,7 +28,7 @@ export default async function DirectorDetailPage({
   params,
 }: DirectorDetailPageProps) {
   const { slug } = await params;
-  const director = await getDirectorBySlug(slug);
+  const director = await getDirectorBySlug(decodeRouteParam(slug));
 
   if (!director) notFound();
 
@@ -72,7 +73,12 @@ export default async function DirectorDetailPage({
             <section className="mt-14 md:mt-20">
               <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-14">
                 {works.map((work, index) => (
-                  <DirectorWorkCard key={work.id} work={work} index={index} />
+                  <DirectorWorkCard
+                    key={work.id}
+                    work={work}
+                    directorSlug={director.slug}
+                    index={index}
+                  />
                 ))}
               </div>
             </section>

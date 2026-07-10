@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Work } from "@/types/work";
+import { workPath } from "@/utils/paths";
 
 interface RelatedWorksProps {
   works: Work[];
@@ -22,7 +23,7 @@ export function RelatedWorks({
         {works.map((work) => (
           <Link
             key={work.id}
-            href={`/work/${work.slug}`}
+            href={workPath(work.slug)}
             className="group block"
           >
             <div className="relative aspect-video overflow-hidden bg-white/5">

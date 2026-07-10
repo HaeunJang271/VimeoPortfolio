@@ -14,13 +14,20 @@ interface MarketingChromeProps {
   instagram: string;
   vimeoUrl: string;
   logo?: string | null;
+  logoHeight?: number;
+  copyrightText?: string;
 }
 
 export function MarketingChrome({
   instagram,
   vimeoUrl,
   logo,
+  logoHeight = 48,
+  copyrightText,
 }: MarketingChromeProps) {
+  const resolvedCopyright =
+    copyrightText?.trim() ||
+    `© ${new Date().getFullYear()} ${BRAND_NAME}. ALL RIGHTS RESERVED.`;
   return (
     <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-40">
       <div className="flex w-full items-end justify-between px-6 pb-8 md:px-10 md:pb-10">
@@ -30,13 +37,16 @@ export function MarketingChrome({
             className="block transition-opacity hover:opacity-70"
           >
             {logo?.trim() ? (
-              <div className="relative h-10 w-36 md:h-12 md:w-44">
+              <div
+                className="relative w-44 max-w-[70vw]"
+                style={{ height: `${logoHeight}px` }}
+              >
                 <Image
                   src={logo}
                   alt={BRAND_NAME}
                   fill
                   className="object-contain object-left"
-                  sizes="(max-width: 768px) 144px, 176px"
+                  sizes="176px"
                 />
               </div>
             ) : (
@@ -48,7 +58,7 @@ export function MarketingChrome({
             )}
           </Link>
           <p className="mt-2 text-[10px] tracking-[0.12em] text-white/70 md:text-[11px]">
-            © {BRAND_NAME}. ALL RIGHTS RESERVED.
+            {resolvedCopyright}
           </p>
         </div>
 

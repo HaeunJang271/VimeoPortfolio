@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Upload, X } from "lucide-react";
 import type { SiteSettings, SiteSettingsFormData } from "@/types/settings";
+import { getDefaultCopyrightText } from "@/utils/copyright";
 
 interface SiteSettingsFormProps {
   settings: SiteSettings;
@@ -22,6 +23,8 @@ export function SiteSettingsForm({ settings }: SiteSettingsFormProps) {
     instagram: settings.instagram,
     vimeoUrl: settings.vimeoUrl,
     logo: settings.logo ?? "",
+    logoHeight: settings.logoHeight,
+    copyrightText: settings.copyrightText,
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [removingLogo, setRemovingLogo] = useState(false);
@@ -34,6 +37,8 @@ export function SiteSettingsForm({ settings }: SiteSettingsFormProps) {
       instagram: settings.instagram,
       vimeoUrl: settings.vimeoUrl,
       logo: settings.logo ?? "",
+      logoHeight: settings.logoHeight,
+      copyrightText: settings.copyrightText,
     });
   }, [settings]);
 
@@ -210,9 +215,13 @@ export function SiteSettingsForm({ settings }: SiteSettingsFormProps) {
         <label className="text-xs tracking-[0.15em] text-white/40">LOGO</label>
         <p className="text-xs text-white/35">
           업로드 시 메인 하단 MAKMALLO 텍스트 대신 로고 이미지가 표시됩니다.
+          아래 높이(px)로 크기를 조절할 수 있습니다.
         </p>
         {form.logo && (
-          <div className="relative h-20 w-48 overflow-hidden bg-white/5 p-4">
+          <div
+            className="relative w-48 overflow-hidden bg-white/5 p-4"
+            style={{ height: `${form.logoHeight}px` }}
+          >
             <Image
               src={form.logo}
               alt="Logo preview"
@@ -243,6 +252,45 @@ export function SiteSettingsForm({ settings }: SiteSettingsFormProps) {
             disabled={uploading}
           />
         </label>
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-xs tracking-[0.15em] text-white/40">
+          LOGO HEIGHT (PX)
+        </label>
+        <input
+          type="number"
+          min={24}
+          max={120}
+          autoComplete="off"
+          value={form.logoHeight}
+          onChange={(e) =>
+            updateField("logoHeight", Number(e.target.value) || 48)
+          }
+          className="admin-number-input w-full border border-white/10 bg-transparent px-4 py-3 text-sm text-white outline-none focus:border-white/30"
+        />
+        <p className="text-xs text-white/35">
+          PNG 해상도를 올리는 것보다 이 값으로 조절하는 것이 더 편합니다.
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-xs tracking-[0.15em] text-white/40">
+          COPYRIGHT
+        </label>
+        <input
+          type="text"
+          required
+          autoComplete="off"
+          placeholder={getDefaultCopyrightText()}
+          value={form.copyrightText}
+          onChange={(e) => updateField("copyrightText", e.target.value)}
+          className="w-full border border-white/10 bg-transparent px-4 py-3 text-sm text-white outline-none focus:border-white/30"
+        />
+        <p className="text-xs text-white/35">
+          하단 저작권 문구입니다. 연도는 직접 수정하세요. 예: © 2026 MAKMALLO.
+          ALL RIGHTS RESERVED.
+        </p>
       </div>
 
       <button

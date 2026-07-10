@@ -15,6 +15,8 @@ export default async function WorkDetailLayout({
         instagram={settings.instagram}
         vimeoUrl={settings.vimeoUrl}
         logo={settings.logo}
+        logoHeight={settings.logoHeight}
+        copyrightText={settings.copyrightText}
       />
     </>
   );

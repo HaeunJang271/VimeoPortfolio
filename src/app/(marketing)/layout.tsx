@@ -22,6 +22,8 @@ export default async function MarketingLayout({
         instagram={settings.instagram}
         vimeoUrl={settings.vimeoUrl}
         logo={settings.logo}
+        logoHeight={settings.logoHeight}
+        copyrightText={settings.copyrightText}
       />
     </>
   );

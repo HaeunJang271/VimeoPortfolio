@@ -6,6 +6,7 @@ import {
 } from "@/lib/firebase/firestore";
 import type { SiteSettings, SiteSettingsFormData } from "@/types/settings";
 import { extractVimeoId } from "@/utils/vimeo";
+import { getDefaultCopyrightText } from "@/utils/copyright";
 
 const SETTINGS_DOC_ID = "site";
 
@@ -25,6 +26,8 @@ function getDefaultSettings(): SiteSettings {
     instagram: "https://instagram.com/studio",
     vimeoUrl: getDefaultVimeoUrl(homepageShowreel),
     logo: null,
+    logoHeight: 48,
+    copyrightText: getDefaultCopyrightText(),
   };
 }
 
@@ -53,6 +56,9 @@ export async function updateSiteSettings(
     .doc(SETTINGS_DOC_ID);
 
   const logo = formData.logo?.trim() ?? "";
+  const logoHeight = Math.min(120, Math.max(24, formData.logoHeight || 48));
+  const copyrightText =
+    formData.copyrightText?.trim() || getDefaultCopyrightText();
 
   await docRef.set(
     {
@@ -62,6 +68,8 @@ export async function updateSiteSettings(
       instagram: formData.instagram,
       vimeoUrl: formData.vimeoUrl,
       logo: logo ? logo : FieldValue.delete(),
+      logoHeight,
+      copyrightText,
     },
     { merge: true }
   );

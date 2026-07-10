@@ -5,6 +5,8 @@ export interface SiteSettings {
   instagram: string;
   vimeoUrl: string;
   logo: string | null;
+  logoHeight: number;
+  copyrightText: string;
 }
 
 export interface SiteSettingsFormData {
@@ -14,4 +16,6 @@ export interface SiteSettingsFormData {
   instagram: string;
   vimeoUrl: string;
   logo: string;
+  logoHeight: number;
+  copyrightText: string;
 }

@@ -4,6 +4,7 @@ import type { Credit, Work } from "@/types/work";
 import type { Timestamp } from "firebase-admin/firestore";
 import { normalizeCredits } from "@/utils/credits";
 import { extractVimeoId } from "@/utils/vimeo";
+import { getDefaultCopyrightText } from "@/utils/copyright";
 
 function getDefaultVimeoUrl(showreel: string): string {
   const id = extractVimeoId(showreel);
@@ -73,5 +74,7 @@ export function docToSiteSettings(
     instagram: data?.instagram ?? "https://instagram.com/studio",
     vimeoUrl: data?.vimeoUrl ?? getDefaultVimeoUrl(homepageShowreel),
     logo: data?.logo?.trim() ? data.logo : null,
+    logoHeight: data?.logoHeight ?? 48,
+    copyrightText: data?.copyrightText?.trim() || getDefaultCopyrightText(),
   };
 }

@@ -2,11 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { getWorkHref } from "@/utils/paths";
 import { motion } from "framer-motion";
 import type { Credit, Work } from "@/types/work";
 
 interface DirectorWorkCardProps {
   work: Work;
+  directorSlug?: string;
   index?: number;
 }
 
@@ -19,7 +21,11 @@ function formatCreditLine(credit: Credit): string {
   return `${role} ${name}`;
 }
 
-export function DirectorWorkCard({ work, index = 0 }: DirectorWorkCardProps) {
+export function DirectorWorkCard({
+  work,
+  directorSlug,
+  index = 0,
+}: DirectorWorkCardProps) {
   return (
     <motion.article
       initial={{ opacity: 0, y: 20 }}
@@ -31,7 +37,7 @@ export function DirectorWorkCard({ work, index = 0 }: DirectorWorkCardProps) {
         ease: [0.22, 1, 0.36, 1],
       }}
     >
-      <Link href={`/work/${work.slug}`} className="group block">
+      <Link href={getWorkHref(work, directorSlug)} className="group block">
         <div className="relative aspect-video overflow-hidden bg-white/5">
           {work.thumbnail ? (
             <Image

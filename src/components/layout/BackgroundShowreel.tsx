@@ -16,7 +16,6 @@ export function BackgroundShowreel({ vimeoUrl }: BackgroundShowreelProps) {
         fill
         className="h-full"
       />
-      <div className="absolute inset-0 bg-black/55" />
     </div>
   );
 }
