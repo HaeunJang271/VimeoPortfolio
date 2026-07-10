@@ -8,7 +8,39 @@ import {
 } from "@/lib/firebase/firestore";
 import type { Director, DirectorFormData } from "@/types/director";
 import type { Work } from "@/types/work";
+import { ensureSlug, slugify } from "@/utils/slug";
 import { sortWorksByOrder } from "@/utils/work-order";
+
+async function resolveUniqueDirectorSlug(
+  name: string,
+  slug: string,
+  excludeId?: string
+): Promise<string> {
+  const baseSlug = slugify(slug) || slugify(name) || ensureSlug(name, "director");
+  let candidate = baseSlug;
+  let counter = 2;
+
+  while (true) {
+    const existing = await getDirectorBySlug(candidate);
+    if (!existing || existing.id === excludeId) {
+      return candidate;
+    }
+    candidate = `${baseSlug}-${counter}`;
+    counter += 1;
+  }
+}
+
+function prepareDirectorPayload(formData: DirectorFormData, slug: string) {
+  return {
+    name: formData.name.trim(),
+    slug,
+    profileImage: formData.profileImage || null,
+    description: formData.description,
+    descriptionLinks: formData.descriptionLinks,
+    workOrder: formData.workOrder ?? [],
+    displayOrder: formData.displayOrder,
+  };
+}
 
 export async function getDirectors(): Promise<Director[]> {
   if (!isFirebaseAdminConfigured()) return [];
@@ -78,20 +110,17 @@ async function getNextDirectorDisplayOrder(): Promise<number> {
 export async function createDirector(
   formData: DirectorFormData
 ): Promise<Director> {
+  const slug = await resolveUniqueDirectorSlug(formData.name, formData.slug);
   const displayOrder =
     formData.displayOrder > 0
       ? formData.displayOrder
       : await getNextDirectorDisplayOrder();
+  const payload = prepareDirectorPayload(formData, slug);
 
   const docRef = await getAdminDb()
     .collection(DIRECTORS_COLLECTION)
     .add({
-      name: formData.name,
-      slug: formData.slug,
-      profileImage: formData.profileImage || null,
-      description: formData.description,
-      descriptionLinks: formData.descriptionLinks,
-      workOrder: formData.workOrder ?? [],
+      ...payload,
       displayOrder,
       createdAt: FieldValue.serverTimestamp(),
     });
@@ -104,17 +133,15 @@ export async function updateDirector(
   id: string,
   formData: DirectorFormData
 ): Promise<Director> {
+  const slug = await resolveUniqueDirectorSlug(
+    formData.name,
+    formData.slug,
+    id
+  );
+  const payload = prepareDirectorPayload(formData, slug);
   const docRef = getAdminDb().collection(DIRECTORS_COLLECTION).doc(id);
 
-  await docRef.update({
-    name: formData.name,
-    slug: formData.slug,
-    profileImage: formData.profileImage || null,
-    description: formData.description,
-    descriptionLinks: formData.descriptionLinks,
-    workOrder: formData.workOrder ?? [],
-    displayOrder: formData.displayOrder,
-  });
+  await docRef.update(payload);
 
   const doc = await docRef.get();
   return docToDirector(doc.id, doc.data()!);
@@ -134,6 +161,20 @@ export async function updateDirectorWorkOrder(
 
   const doc = await docRef.get();
   return docToDirector(doc.id, doc.data()!);
+}
+
+export async function updateDirectorsDisplayOrder(
+  directorIds: string[]
+): Promise<void> {
+  const db = getAdminDb();
+  const batch = db.batch();
+
+  directorIds.forEach((directorId, index) => {
+    const docRef = db.collection(DIRECTORS_COLLECTION).doc(directorId);
+    batch.update(docRef, { displayOrder: index });
+  });
+
+  await batch.commit();
 }
 
 export async function getWorksByDirectorId(

@@ -26,3 +26,19 @@ export async function revalidateAfterWorkChange(options?: {
     }
   }
 }
+
+export async function revalidateAfterDirectorChange(options?: {
+  slug?: string;
+  previousSlug?: string;
+}) {
+  revalidatePath("/directors");
+  revalidatePath("/admin/directors");
+
+  const slugs = new Set<string>();
+  if (options?.slug) slugs.add(options.slug);
+  if (options?.previousSlug) slugs.add(options.previousSlug);
+
+  for (const slug of slugs) {
+    revalidatePath(`/directors/${slug}`);
+  }
+}

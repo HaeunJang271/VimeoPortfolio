@@ -19,6 +19,7 @@ export default async function MarketingLayout({
       <MarketingChrome
         instagram={settings.instagram}
         vimeoUrl={settings.vimeoUrl}
+        logo={settings.logo}
       />
     </>
   );

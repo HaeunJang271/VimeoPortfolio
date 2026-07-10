@@ -14,6 +14,7 @@ export default async function DirectorDetailLayout({
       <MarketingChrome
         instagram={settings.instagram}
         vimeoUrl={settings.vimeoUrl}
+        logo={settings.logo}
       />
     </>
   );

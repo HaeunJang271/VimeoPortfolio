@@ -165,6 +165,9 @@ export function SiteSettingsForm({ settings }: SiteSettingsFormProps) {
 
       <div className="space-y-2">
         <label className="text-xs tracking-[0.15em] text-white/40">LOGO</label>
+        <p className="text-xs text-white/35">
+          업로드 시 메인 하단 MAKMALLO 텍스트 대신 로고 이미지가 표시됩니다.
+        </p>
         {form.logo && (
           <div className="relative h-20 w-48 overflow-hidden bg-white/5 p-4">
             <Image

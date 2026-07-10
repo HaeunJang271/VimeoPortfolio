@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import type { Director } from "@/types/director";
@@ -26,17 +27,30 @@ export function DirectorCard({ director, index = 0 }: DirectorCardProps) {
         className="group block border-b border-white/10 py-8 transition-colors hover:border-white/30 md:py-10"
       >
         <div className="flex items-center justify-between gap-6">
-          <div>
-            <h3 className="text-xl font-medium tracking-[0.04em] text-white md:text-3xl">
-              {director.name}
-            </h3>
-            {director.description && (
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/50 md:text-base">
-                {director.description}
-              </p>
-            )}
+          <div className="flex min-w-0 items-center gap-5 md:gap-8">
+            {director.profileImage ? (
+              <div className="relative h-16 w-14 shrink-0 overflow-hidden bg-white/5 md:h-20 md:w-16">
+                <Image
+                  src={director.profileImage}
+                  alt={director.name}
+                  fill
+                  className="object-cover"
+                  sizes="64px"
+                />
+              </div>
+            ) : null}
+            <div className="min-w-0">
+              <h3 className="text-xl font-medium tracking-[0.04em] text-white md:text-3xl">
+                {director.name}
+              </h3>
+              {director.description && (
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/50 md:text-base">
+                  {director.description}
+                </p>
+              )}
+            </div>
           </div>
-          <span className="text-xs tracking-[0.2em] text-white/35 transition-transform duration-500 group-hover:translate-x-1">
+          <span className="shrink-0 text-xs tracking-[0.2em] text-white/35 transition-transform duration-500 group-hover:translate-x-1">
             VIEW
           </span>
         </div>

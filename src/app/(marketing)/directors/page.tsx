@@ -3,6 +3,8 @@ import { DirectorCard } from "@/components/DirectorCard";
 import { FadeIn } from "@/components/FadeIn";
 import { getDirectors } from "@/services/directors";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Directors",
 };

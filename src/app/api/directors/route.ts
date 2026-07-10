@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { requireAdminUser } from "@/lib/firebase/auth-server";
+import { revalidateAfterDirectorChange } from "@/lib/revalidate";
 import { createDirector, getDirectors } from "@/services/directors";
 import type { DirectorFormData } from "@/types/director";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   const directors = await getDirectors();
@@ -13,6 +16,7 @@ export async function POST(request: Request) {
     await requireAdminUser();
     const body = (await request.json()) as DirectorFormData;
     const director = await createDirector(body);
+    await revalidateAfterDirectorChange({ slug: director.slug });
     return NextResponse.json(director, { status: 201 });
   } catch (error) {
     const message =

@@ -4,7 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2, Upload } from "lucide-react";
-import { slugify } from "@/utils/slug";
+import { ensureSlug, slugify } from "@/utils/slug";
+import { readJsonResponse } from "@/utils/http";
 import type {
   Director,
   DirectorDescriptionLink,
@@ -45,7 +46,7 @@ export function DirectorForm({ director, mode }: DirectorFormProps) {
   function handleNameChange(name: string) {
     updateField("name", name);
     if (mode === "create") {
-      updateField("slug", slugify(name));
+      updateField("slug", ensureSlug(name, "director"));
     }
   }
 
@@ -103,6 +104,7 @@ export function DirectorForm({ director, mode }: DirectorFormProps) {
     try {
       const payload: DirectorFormData = {
         ...form,
+        slug: slugify(form.slug) || ensureSlug(form.name, "director"),
         descriptionLinks: form.descriptionLinks.filter(
           (link) => link.label.trim() && link.url.trim()
         ),
@@ -118,7 +120,7 @@ export function DirectorForm({ director, mode }: DirectorFormProps) {
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
+      const data = await readJsonResponse<Director & { error?: string }>(res);
       if (!res.ok) throw new Error(data.error ?? "Save failed");
 
       router.push("/admin/directors");
@@ -180,6 +182,9 @@ export function DirectorForm({ director, mode }: DirectorFormProps) {
         <label className="text-xs tracking-[0.15em] text-white/40">
           PROFILE IMAGE
         </label>
+        <p className="text-xs text-white/35">
+          Directors 목록·상세 페이지에 표시됩니다.
+        </p>
         {form.profileImage && (
           <div className="relative aspect-[4/5] w-full max-w-sm overflow-hidden bg-white/5">
             <Image
