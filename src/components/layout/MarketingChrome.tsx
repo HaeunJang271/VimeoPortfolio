@@ -70,7 +70,7 @@ export function MarketingChrome({
           </p>
         </div>
 
-        <div className="pointer-events-auto flex items-center gap-5 md:gap-6">
+        <div className="pointer-events-auto flex items-center gap-3 rounded-full bg-black/55 px-3 py-2 backdrop-blur-sm md:gap-6 md:bg-transparent md:px-0 md:py-0">
           {instagram ? (
             <a
               href={instagram}
@@ -79,7 +79,7 @@ export function MarketingChrome({
               aria-label="Instagram"
               className="text-white transition-opacity hover:opacity-60"
             >
-              <InstagramIcon className="h-5 w-5 md:h-6 md:w-6" />
+              <InstagramIcon className="h-5 w-5 shrink-0 md:h-6 md:w-6" />
             </a>
           ) : null}
           <a
@@ -87,14 +87,15 @@ export function MarketingChrome({
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Vimeo"
-            className="text-white transition-opacity hover:opacity-60"
+            className="flex shrink-0 items-center justify-center transition-opacity hover:opacity-60"
           >
             <Image
               src="/logo/vimeo.png"
               alt="Vimeo"
               width={24}
               height={24}
-              className="h-5 w-5 object-contain md:h-6 md:w-6"
+              unoptimized
+              className="h-5 w-5 object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)] md:h-6 md:w-6"
             />
           </a>
         </div>

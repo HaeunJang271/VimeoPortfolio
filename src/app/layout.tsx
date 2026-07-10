@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { SITE_NAME } from "@/utils/constants";
+import { buildSiteMetadata } from "@/lib/metadata";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -9,13 +9,7 @@ const inter = Inter({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: SITE_NAME,
-    template: `%s — ${SITE_NAME}`,
-  },
-  description: "Video production studio portfolio",
-};
+export const metadata: Metadata = buildSiteMetadata();
 
 export default function RootLayout({
   children,
