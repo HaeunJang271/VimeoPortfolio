@@ -100,7 +100,7 @@ export function MarketingChrome({
           </div>
         </div>
 
-        <div className="pointer-events-auto flex shrink-0 items-center gap-3 rounded-full bg-black/70 px-3 py-2.5 shadow-[0_4px_20px_rgba(0,0,0,0.45)] backdrop-blur-sm md:gap-5 md:bg-black/55 md:px-3.5 md:py-2">
+        <div className="pointer-events-auto flex shrink-0 items-center gap-3 md:gap-5">
           {instagram ? (
             <a
               href={instagram}
