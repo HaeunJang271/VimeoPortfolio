@@ -18,16 +18,15 @@ export function getSiteUrl(): string {
 
 export function buildSiteMetadata(settings?: Pick<SiteSettings, "logo">): Metadata {
   const siteUrl = getSiteUrl();
-  const ogImage = settings?.logo?.trim()
-    ? [
-        {
-          url: settings.logo,
-          width: 1200,
-          height: 630,
-          alt: SITE_NAME,
-        },
-      ]
-    : [{ url: "/opengraph-image", width: 1200, height: 630, alt: SITE_NAME }];
+  const logo = settings?.logo?.trim();
+  const ogImage = [
+    {
+      url: "/opengraph-image",
+      width: 1200,
+      height: 630,
+      alt: SITE_NAME,
+    },
+  ];
 
   return {
     metadataBase: new URL(siteUrl),
@@ -36,6 +35,14 @@ export function buildSiteMetadata(settings?: Pick<SiteSettings, "logo">): Metada
       template: `%s — ${SITE_NAME}`,
     },
     description: DEFAULT_DESCRIPTION,
+    ...(logo
+      ? {
+          icons: {
+            icon: logo,
+            apple: logo,
+          },
+        }
+      : {}),
     openGraph: {
       type: "website",
       locale: "ko_KR",

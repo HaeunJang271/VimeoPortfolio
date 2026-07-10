@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { buildSiteMetadata } from "@/lib/metadata";
+import { getSiteSettings } from "@/services/settings";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -9,7 +10,12 @@ const inter = Inter({
   display: "swap",
 });
 
-export const metadata: Metadata = buildSiteMetadata();
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  return buildSiteMetadata(settings);
+}
 
 export default function RootLayout({
   children,
