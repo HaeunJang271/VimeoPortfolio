@@ -18,10 +18,7 @@ export default async function MarketingLayout({
   return (
     <>
       <Header />
-      <BackgroundShowreel
-        videoId={showreel.videoId}
-        posterUrl={showreel.posterUrl}
-      />
+      <BackgroundShowreel videoId={showreel.videoId} />
       <MarketingContent>{children}</MarketingContent>
       <MarketingChrome
         instagram={settings.instagram}

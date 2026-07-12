@@ -1,21 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { getVimeoEmbedUrl } from "@/utils/vimeo";
 
 interface BackgroundShowreelProps {
   videoId: string | null;
-  posterUrl: string | null;
 }
 
 const VIMEO_ORIGIN = "https://player.vimeo.com";
 
-export function BackgroundShowreel({
-  videoId,
-  posterUrl,
-}: BackgroundShowreelProps) {
+export function BackgroundShowreel({ videoId }: BackgroundShowreelProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
     if (!videoId) return;
@@ -30,7 +25,7 @@ export function BackgroundShowreel({
     function handleMessage(event: MessageEvent) {
       if (event.origin !== VIMEO_ORIGIN) return;
 
-      let data: { event?: string; method?: string };
+      let data: { event?: string };
       try {
         data =
           typeof event.data === "string" ? JSON.parse(event.data) : event.data;
@@ -38,15 +33,9 @@ export function BackgroundShowreel({
         return;
       }
 
-      // 플레이어가 준비되면 재생 이벤트를 구독하고 자동재생을 시도한다.
+      // 플레이어가 준비되면 자동재생을 시도한다.
       if (data.event === "ready") {
-        post("addEventListener", "play");
-        post("addEventListener", "playing");
         post("play");
-      }
-
-      if (data.event === "play" || data.event === "playing") {
-        setPlaying(true);
       }
     }
 
@@ -79,18 +68,6 @@ export function BackgroundShowreel({
 
   return (
     <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-black">
-      {posterUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={posterUrl}
-          alt=""
-          aria-hidden
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
-            playing ? "opacity-0" : "opacity-100"
-          }`}
-        />
-      ) : null}
-
       {videoId ? (
         <iframe
           ref={iframeRef}
@@ -99,7 +76,6 @@ export function BackgroundShowreel({
           allow="autoplay; fullscreen; picture-in-picture"
           allowFullScreen
           onLoad={() => {
-            // ready 메시지를 놓친 경우를 대비한 재시도.
             iframeRef.current?.contentWindow?.postMessage(
               JSON.stringify({ method: "play" }),
               VIMEO_ORIGIN
