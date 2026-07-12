@@ -2,6 +2,7 @@ import { Header } from "@/components/Header";
 import { BackgroundShowreel } from "@/components/layout/BackgroundShowreel";
 import { MarketingChrome } from "@/components/layout/MarketingChrome";
 import { MarketingContent } from "@/components/layout/MarketingContent";
+import { getShowreelMedia } from "@/lib/vimeo/showreel";
 import { getSiteSettings } from "@/services/settings";
 
 export const dynamic = "force-dynamic";
@@ -12,11 +13,15 @@ export default async function MarketingLayout({
   children: React.ReactNode;
 }) {
   const settings = await getSiteSettings();
+  const showreel = await getShowreelMedia(settings.homepageShowreel);
 
   return (
     <>
       <Header />
-      <BackgroundShowreel vimeoUrl={settings.homepageShowreel} />
+      <BackgroundShowreel
+        videoId={showreel.videoId}
+        posterUrl={showreel.posterUrl}
+      />
       <MarketingContent>{children}</MarketingContent>
       <MarketingChrome
         instagram={settings.instagram}
