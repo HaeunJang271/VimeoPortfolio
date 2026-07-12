@@ -138,27 +138,8 @@ export function ProjectForm({
       const data = await readJsonResponse<Work & { error?: string }>(res);
       if (!res.ok) throw new Error(data.error ?? "Save failed");
 
-      if (
-        mode === "create" &&
-        initialDirectorIds.length === 1 &&
-        data.id
-      ) {
-        const directorId = initialDirectorIds[0];
-        const directorRes = await fetch(`/api/directors/${directorId}`);
-        const director = await directorRes.json();
-
-        if (directorRes.ok) {
-          const workOrder = [
-            ...(director.workOrder ?? []),
-            data.id as string,
-          ];
-          await fetch(`/api/directors/${directorId}/work-order`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ workOrder }),
-          });
-        }
-      }
+      // 새 작품은 디렉터 workOrder에 넣지 않는다.
+      // 정렬 로직(sortWorksByOrder)이 수동 정렬에 없는 작품을 최신순으로 맨 위에 노출한다.
 
       router.push(returnTo ?? "/admin/works");
       router.refresh();

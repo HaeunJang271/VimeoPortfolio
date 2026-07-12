@@ -28,16 +28,18 @@ async function prepareWorkPayload(formData: WorkFormData) {
   };
 }
 
-async function getNextDisplayOrder(): Promise<number> {
+// 새로 추가되는 작품은 목록 맨 위(최신)에 노출되어야 하므로
+// 기존 최솟값보다 1 작은 displayOrder를 부여한다. (오름차순 정렬 시 최상단)
+async function getTopDisplayOrder(): Promise<number> {
   const snapshot = await getAdminDb()
     .collection(WORKS_COLLECTION)
-    .orderBy("displayOrder", "desc")
+    .orderBy("displayOrder", "asc")
     .limit(1)
     .get();
 
   if (snapshot.empty) return 0;
 
-  return (snapshot.docs[0].data().displayOrder ?? 0) + 1;
+  return (snapshot.docs[0].data().displayOrder ?? 0) - 1;
 }
 
 export async function getWorks(): Promise<Work[]> {
@@ -99,7 +101,7 @@ export async function getWorkById(id: string): Promise<Work | null> {
 export async function createWork(formData: WorkFormData): Promise<Work> {
   const payload = await prepareWorkPayload(formData);
   const displayOrder =
-    formData.displayOrder > 0 ? formData.displayOrder : await getNextDisplayOrder();
+    formData.displayOrder > 0 ? formData.displayOrder : await getTopDisplayOrder();
 
   const docRef = await getAdminDb()
     .collection(WORKS_COLLECTION)
