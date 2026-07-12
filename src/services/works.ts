@@ -3,7 +3,7 @@ import { getAdminDb, isFirebaseAdminConfigured } from "@/lib/firebase/admin";
 import { docToWork, WORKS_COLLECTION } from "@/lib/firebase/firestore";
 import { resolveVimeoVideoId } from "@/lib/vimeo/resolve";
 import type { Work, WorkFormData } from "@/types/work";
-import { sortWorksByOrder } from "@/utils/work-order";
+import { sortWorksByOrder, sortWorksForDisplay } from "@/utils/work-order";
 
 async function prepareWorkPayload(formData: WorkFormData) {
   const vimeoVideoId = await resolveVimeoVideoId(formData.vimeoUrl);
@@ -28,30 +28,17 @@ async function prepareWorkPayload(formData: WorkFormData) {
   };
 }
 
-// 새로 추가되는 작품은 목록 맨 위(최신)에 노출되어야 하므로
-// 기존 최솟값보다 1 작은 displayOrder를 부여한다. (오름차순 정렬 시 최상단)
-async function getTopDisplayOrder(): Promise<number> {
-  const snapshot = await getAdminDb()
-    .collection(WORKS_COLLECTION)
-    .orderBy("displayOrder", "asc")
-    .limit(1)
-    .get();
-
-  if (snapshot.empty) return 0;
-
-  return (snapshot.docs[0].data().displayOrder ?? 0) - 1;
-}
+// 아직 수동 정렬하지 않은 새 작품임을 나타내는 음수 값.
+// 실제 순서는 createdAt(추가 시각) 기준으로 정하므로 값 자체는 음수이기만 하면 된다.
+const UNARRANGED_DISPLAY_ORDER = -1;
 
 export async function getWorks(): Promise<Work[]> {
   if (!isFirebaseAdminConfigured()) return [];
 
   try {
-    const snapshot = await getAdminDb()
-      .collection(WORKS_COLLECTION)
-      .orderBy("displayOrder", "asc")
-      .get();
-
-    return snapshot.docs.map((doc) => docToWork(doc.id, doc.data()));
+    const snapshot = await getAdminDb().collection(WORKS_COLLECTION).get();
+    const works = snapshot.docs.map((doc) => docToWork(doc.id, doc.data()));
+    return sortWorksForDisplay(works);
   } catch (error) {
     console.error("Failed to fetch works:", error);
     return [];
@@ -101,7 +88,7 @@ export async function getWorkById(id: string): Promise<Work | null> {
 export async function createWork(formData: WorkFormData): Promise<Work> {
   const payload = await prepareWorkPayload(formData);
   const displayOrder =
-    formData.displayOrder > 0 ? formData.displayOrder : await getTopDisplayOrder();
+    formData.displayOrder > 0 ? formData.displayOrder : UNARRANGED_DISPLAY_ORDER;
 
   const docRef = await getAdminDb()
     .collection(WORKS_COLLECTION)
