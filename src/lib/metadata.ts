@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { BRAND_NAME, SITE_NAME } from "@/utils/constants";
 
-const DEFAULT_DESCRIPTION = "Video production studio portfolio";
+const DEFAULT_DESCRIPTION = "Make all kind of creative videos";
 
 export function getSiteUrl(): string {
   if (process.env.NEXT_PUBLIC_SITE_URL?.trim()) {
